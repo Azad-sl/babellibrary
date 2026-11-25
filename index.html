@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>巴别图书馆</title>
+<meta name="description" content="一座由字母与标点随机生成的六角回廊图书馆——向博尔赫斯《巴别图书馆》致敬的 3D 交互装置。">
+<meta name="theme-color" content="#050505">
+<meta property="og:title" content="巴别图书馆 · The Library of Babel">
+<meta property="og:description" content="六角回廊环环相嵌，书与书架由二十几个字母与逗、句、空格随机拼合而成。每一册书，都刚刚被随意地“写”了出来。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://babellibrary.azad.asia/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" href="favicon-96.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 @font-face{font-family:Kangxi;src:url("Kangxi-subset.woff2") format("woff2");font-display:swap}
 *{box-sizing:border-box}
@@ -163,18 +173,9 @@ function applyLang(l){
 (function(){
   let l=null;try{l=localStorage.getItem("babel_lang")}catch(_){}
   if(l!=="zh"&&l!=="en"){
-    l=/^en/i.test(navigator.language||"")?"en":"zh";
-    (async()=>{
-      try{
-        const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),1800);
-        const r=await fetch("https://ipwho.is/",{signal:ac.signal});clearTimeout(tm);
-        const j=await r.json(),cc=j&&j.country_code;
-        if(!cc)return;
-        const zhAreas=["CN","TW","HK","MO","SG","MY"];
-        const ip=zhAreas.includes(cc)?"zh":"en";
-        if(ip!==window.__lang)applyLang(ip);
-      }catch(_){}
-    })();
+    let tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(_){}
+    const zhTz=["Asia/Shanghai","Asia/Urumqi","Asia/Hong_Kong","Asia/Macau","Asia/Taipei","Asia/Singapore","Asia/Kuala_Lumpur"];
+    l=zhTz.includes(tz)?"zh":(/^en/i.test(navigator.language||"")?"en":"zh");
   }
   window.__lang=l;
   applyLang(l);
@@ -1003,7 +1004,7 @@ if(window.visualViewport)visualViewport.addEventListener("resize",fitReader);
 window.__onLang=()=>{if(curBook&&!reader.hidden)syncStatic()};
 
 function size(){const w=canvas.clientWidth,h=canvas.clientHeight,p=Math.min(devicePixelRatio,mobile?1.75:2.25,Math.sqrt((mobile?2400000:3200000)/(w*h)));r.setPixelRatio(p);r.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<h?65:57;cam.updateProjectionMatrix();glyphU.px=h*p*.32;if(post){post.setPixelRatio(p);post.setSize(w,h);aa.uniforms.resolution.value.set(1/post.readBuffer.width,1/post.readBuffer.height);dof.uniforms.aspect.value=w/h}}size();addEventListener("resize",size);
-function frame(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;time+=dt*(quiet?.2:1);if(!flight)ctl.update();cam.updateMatrixWorld();
+function frame(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;fq=fq||0,fn2=fn2||0;if(post&&time>3){fq+=dt;fn2++;if(fn2>=120){if(fq/fn2>1/29){post=null;aa=null;dof=null;size()}else{fq=0;fn2=0}}}time+=dt*(quiet?.2:1);if(!flight)ctl.update();cam.updateMatrixWorld();
 for(const m of books){if(m===flight)continue;const d=m.userData,s0=time*d.fF+d.fP;
   m.position.copy(d.base);m.position.y+=d.fA*Math.sin(s0);
   const rr=Math.sin(time*d.rF+d.rP)*.15;
@@ -1057,6 +1058,11 @@ addEventListener("pageshow",()=>{held.clear();down=null;last=performance.now();
 canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();r.setAnimationLoop(null);fail(t("ctx"))});
 canvas.addEventListener("webglcontextrestored",()=>location.reload());
 if(!mobile&&r.extensions.has("EXT_color_buffer_float"))try{const modules=await Promise.all(["postprocessing/EffectComposer","postprocessing/RenderPass","postprocessing/BokehPass","postprocessing/UnrealBloomPass","postprocessing/ShaderPass","shaders/FXAAShader","postprocessing/OutputPass"].map(s2=>import("three/addons/"+s2+".js")));const [C,P,B,L,S,F,O]=modules,composer=new C.EffectComposer(r,new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:4}));dof=new B.BokehPass(scene,cam,{focus:6.5,aperture:.00024,maxblur:.0018});const draw=dof.render.bind(dof);dof.render=(...args)=>{air.visible=false;try{draw(...args)}finally{air.visible=true}};aa=new S.ShaderPass(F.FXAAShader);for(const p of [new P.RenderPass(scene,cam),dof,new L.UnrealBloomPass(new T.Vector2(1,1),.3,.3,.9),aa,new O.OutputPass()])composer.addPass(p);post=composer;size()}catch{post=null}
+}
+</script>
+<script>
+if("serviceWorker" in navigator&&/^https:$/.test(location.protocol)){
+  addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 }
 </script>
 </body>
