@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>巴别图书馆</title>
+<style>
+@font-face{font-family:Kangxi;src:local("nzgrKangxi"),url("./nzgrKangxi.ttf") format("truetype");font-display:swap}
+*{box-sizing:border-box}
+html,body,main{margin:0;width:100%;height:100%;overflow:hidden;background:#050505;color:#d8c8a8;font-family:Kangxi,"Songti SC",SimSun,serif}
+body.en{font-family:Georgia,"Times New Roman","Songti SC",SimSun,serif}
+main{position:relative}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+main:after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;pointer-events:none;background:radial-gradient(ellipse,transparent 47%,#02040373)}
+header,footer{position:absolute;z-index:1;left:0;right:0;text-align:center;pointer-events:none}
+header{top:max(4%,env(safe-area-inset-top))}
+small{font-size:11px;color:#ac9878;letter-spacing:.42em;padding-left:.42em}
+body.en small{letter-spacing:.3em;padding-left:.3em;font-size:10px}
+h1{font-size:38px;font-weight:400;margin:6px 0;letter-spacing:.3em;padding-left:.3em;background:linear-gradient(#ae9570,#eee1bf 38%,#a68c63 70%,#d9c59d);background-clip:text;-webkit-background-clip:text;color:transparent}
+body.en h1{letter-spacing:.1em;padding-left:.1em;font-size:clamp(24px,4.4vw,42px)}
+.emblem{height:36px;width:36px;vertical-align:-12px;margin-left:12px;filter:drop-shadow(0 0 9px #d8b16e55)}
+footer{bottom:4%;font-size:12px;color:#c9b89c99;letter-spacing:.14em}
+body.en footer{letter-spacing:.03em}
+footer a{pointer-events:auto;color:inherit;text-decoration:none;border-bottom:1px solid #c9b89c44;transition:color .3s}
+footer a:hover{color:#ecd9ab}
+p{position:absolute;top:43%;width:100%;text-align:center;color:#baa98a;font-size:14px;pointer-events:none}
+#tip{position:absolute;z-index:4;pointer-events:none;font-size:13px;letter-spacing:.14em;color:#e6d4a8;background:#0e0a06d9;border:1px solid #62574b;padding:5px 12px;opacity:0;transition:opacity .16s;white-space:nowrap}
+body.en #tip{letter-spacing:.05em}
+#fade{position:fixed;top:0;right:0;bottom:0;left:0;z-index:7;background:#0a0806;opacity:0;pointer-events:none;transition:opacity .28s ease}
+#reader{position:fixed;top:0;right:0;bottom:0;left:0;z-index:8;display:flex;align-items:center;justify-content:center;background:#0b0a08f2;opacity:0;transition:opacity .3s ease}
+#reader[hidden]{display:none}
+#reader.on{opacity:1}
+#book{position:absolute;left:50%;top:50%;width:604px;height:470px;margin:-235px 0 0 -302px;perspective:1600px;user-select:none;-webkit-user-select:none;touch-action:none;
+  will-change:transform}
+#book .half{position:absolute;top:0;width:300px;height:470px;overflow:hidden;cursor:pointer;background:#15110c}
+#book .half.left{left:2px;box-shadow:inset -26px 0 34px -20px #5c43245e,0 26px 54px #000d}
+#book .half.right{right:2px;box-shadow:inset 26px 0 34px -20px #5c43245e,0 26px 54px #000d}
+#book .slotface{position:absolute;top:0;right:0;bottom:0;left:0}
+#book .pg{position:absolute;top:0;right:0;bottom:0;left:0;background:#e7d9b4;padding:20px 18px 34px}
+#book .pt{height:100%;overflow:hidden;font:12px/1.88 Georgia,"Times New Roman",serif;color:#33291c;letter-spacing:.3px;white-space:pre-wrap;word-break:break-all}
+#book .pn{position:absolute;left:0;right:0;bottom:11px;text-align:center;font:11px Georgia,serif;color:#6b5638;letter-spacing:.2em;opacity:.85}
+#book .pg.tp,#book .pg.colo{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#e7d9b4;text-align:center}
+#book .tp .hexs,#book .colo .hexs{width:58px;height:58px;opacity:.85}
+#book .tp .ttl{font:600 19px Georgia,serif;color:#2c2317;letter-spacing:.08em;max-width:82%;word-break:break-all;line-height:1.5}
+#book .tp .sub{font:10px Georgia,serif;letter-spacing:.42em;color:#7a6647}
+#book .tp .rule,#book .colo .rule{width:110px;height:1px;background:#a08a5e66;margin:2px 0}
+#book .tp .idx,#book .colo .idx{font:11px Georgia,"Songti SC",serif;color:#6b5638;letter-spacing:.14em;line-height:1.9}
+#book .colo .big{font:13px Georgia,serif;color:#4a3a24;letter-spacing:.3em}
+#book canvas.cvr{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;display:block}
+#book .edge{position:absolute;top:8px;bottom:8px;width:5px;opacity:.4;pointer-events:none;
+  background:repeating-linear-gradient(to right,#cbb98f 0 1px,#a08c64 1px 2px);border-radius:1px}
+#book .edge.eL{left:-4px}#book .edge.eR{right:-4px}
+#book .gutter{position:absolute;left:calc(50% - 16px);top:0;width:32px;height:100%;pointer-events:none;
+  background:linear-gradient(90deg,#3a2a1800,#3a2a1826 30%,#261a0e5e 50%,#3a2a1826 70%,#3a2a1800)}
+#lshadow{position:absolute;top:0;bottom:0;left:calc(50% - 95px);width:190px;opacity:0;pointer-events:none;z-index:2;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.5) 0%,rgba(0,0,0,.2) 42%,transparent 72%)}
+#book .leaf{position:absolute;top:0;left:302px;width:300px;height:470px;transform-style:preserve-3d;
+  transform-origin:0% 50%;display:none;will-change:transform;z-index:3;pointer-events:none}
+#book .leaf .face{position:absolute;top:0;right:0;bottom:0;left:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#book .leaf .face.b{transform:rotateY(180deg)}
+#about{position:fixed;top:0;right:0;bottom:0;left:0;z-index:9;display:flex;align-items:center;justify-content:center;background:#000000a8;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .28s ease}
+#about[hidden]{display:none}
+#about.on{opacity:1}
+#about article{position:relative;max-width:460px;width:calc(100vw - 40px);max-height:82vh;overflow:auto;background:#101613f5;border:1px solid #625741;box-shadow:0 14px 70px #000d;padding:30px 34px 26px;transform:translateY(12px) scale(.985);transition:transform .28s ease}
+#about.on article{transform:none}
+#about h2{font-size:19px;font-weight:400;color:#e6d3a8;letter-spacing:.4em;margin:0 0 16px;text-align:center}
+body.en #about h2{letter-spacing:.12em}
+#about h2 .emblem{height:30px;width:30px;vertical-align:-9px;margin-left:10px}
+#about article p{position:static;font-size:13px;line-height:2.05;color:#c6b598;margin:0 0 12px;text-align:justify;pointer-events:auto}
+#about .epigraph{color:#d9c79e;text-align:center;line-height:1.9;margin-bottom:14px}
+#about .epigraph span{display:block;font-size:11px;color:#8f826b;margin-top:4px}
+#about .count{color:#9a8c72;text-align:center;font-size:12px}
+#about .who{display:block;text-align:center;margin:16px 0 6px;font-size:13px;color:#b7a684}
+#about .who a{color:#d8bd8b;text-decoration:none;border-bottom:1px solid #d8bd8b55;padding-bottom:1px;pointer-events:auto}
+#about .who a:hover{color:#f0d9a6}
+#about .close{display:block;margin:14px auto 0;background:none;border:1px solid #625741;color:#c9b48b;font:inherit;font-size:13px;letter-spacing:.3em;text-indent:.3em;padding:9px 26px;cursor:pointer;transition:border-color .3s,color .3s}
+#about .close:hover{border-color:#c9a25e;color:#ecd9ab}
+@media(max-width:600px){h1{font-size:30px}body.en h1{font-size:22px}.emblem{height:28px;width:28px;vertical-align:-9px;margin-left:8px}footer{font-size:10px}#about article{padding:24px 20px 20px}#about article p{font-size:12px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"}}</script>
+</head>
+<body>
+<main>
+<canvas aria-label="The Library of Babel"></canvas>
+<header><small>六 角 回 廊</small><h1>巴 别 图 书 馆</h1><svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><polygon points="33.9,12 33.9,28 20,36 6.1,28 6.1,12 20,4" fill="none" stroke="#bd9a5e" stroke-width="1.6"/><polygon points="28.7,15 28.7,25 20,30 11.3,25 11.3,15 20,10" fill="none" stroke="#8f7a52" stroke-width="1"/><circle cx="20" cy="20" r="1.8" fill="#d8b16e"/></svg></header>
+<footer>拖拽环视 · 滚轮推拉 · 点击取卷 · <a href="#" id="langBtn">EN</a> · <a href="#" id="about-link">馆志</a></footer>
+<p id="status" role="status">圖書館正在開啟…</p>
+<span id="tip"></span>
+
+<div id="fade"></div>
+
+<div id="reader" hidden>
+  <div id="book">
+    <div class="edge eL" id="edgeL"></div>
+    <div class="half left" id="halfL"><div class="slotface" id="faceL"></div></div>
+    <div class="half right" id="halfR"><div class="slotface" id="faceR"></div></div>
+    <div class="gutter" id="gutterEl"></div>
+    <div class="edge eR" id="edgeR"></div>
+    <div id="lshadow"></div>
+    <div class="leaf" id="leaf">
+      <div class="face" id="leafF"></div>
+      <div class="face b" id="leafB"></div>
+    </div>
+  </div>
+</div>
+
+<div id="about" hidden><article></article></div>
+</main>
+
+<!-- 独立哨兵脚本 -->
+<script>
+function reportError(t2){const m=document.getElementById("status");if(m&&m.hidden!==true)m.textContent="载入异常 / Load error: "+t2+"（请刷新 / please refresh）"}
+addEventListener("error",ev=>reportError((ev&&ev.message)||"unknown"));
+addEventListener("unhandledrejection",ev=>reportError((ev&&ev.reason&&ev.reason.message)||"unknown"));
+</script>
+<!-- 语言与引导脚本 -->
+<script>
+const I18N={
+zh:{title:"巴别图书馆",hex:"六 角 回 廊",h1:"巴 别 图 书 馆",footer:"拖拽环视 · 滚轮推拉 · 点击取卷",about:"馆志",opening:"圖書館正在開啟…",
+ wd:"圖書館久未開啟 · 請檢查網絡後刷新重試",fail3d:"未能開啟三維場景",ctx:"圖形設備已暫停，請刷新。",take:"取卷",blog:"博客",
+ abTitle:"巴 别 馆 志",epi:"「宇宙（别人管它叫图书馆）。」",epiBy:"—— 博尔赫斯《巴别图书馆》",
+ ab1:"此馆致敬该篇：六角回廊环环相嵌，墙上与半空的书，皆由二十几个字母与逗、句、空格随机拼合而成。书脊上那些题名并非书名，只是字母的偶然；绝大多数书是无可解读的天书——您现在看到的每一册，都刚刚被随意地“写”了出来。",
+ ab2:"取下任何一卷，先见封面；点按右半向左翻、左半向右翻，亦可按住页边拖拽翻页，直至封底。若某页忽然读出了意义，请理解为巧合：在一座收藏一切可能的图书馆里，谬误与奇迹同属馆藏。",
+ keeper:"图书馆管理员 · ",close:"合 卷",readN:"至此，您已在此馆翻阅过 {n} 页。"},
+en:{title:"The Library of Babel",hex:"THE HEXAGONAL GALLERIES",h1:"The Library of Babel",footer:"Drag to look around · Scroll to approach · Click to take a volume",about:"About",opening:"The Library is opening…",
+ wd:"The Library is slow to open · check your connection and refresh",fail3d:"Could not start the 3-D scene",ctx:"The graphics device was paused — please refresh.",take:"take",blog:"Blog",
+ abTitle:"About this Library",epi:"“The universe (which others call the Library)…”",epiBy:"— Jorge Luis Borges, “The Library of Babel”",
+ ab1:"This Library is a homage to that story: hexagonal galleries nested without end; the books on the walls and in the air are composed at random from some two dozen letters, a comma, a period and a space. The marks on the spines are not titles, only accidents of letters; most volumes are indecipherable gibberish — every book you see has just been “written”, here, now.",
+ ab2:"Take down any volume: first the cover; tap the right half to turn forward and the left half to turn back, or drag a page edge. Should a page suddenly make sense, take it as coincidence: in a Library that holds all possible books, error and miracle belong alike to the collection.",
+ keeper:"Librarian · ",close:"CLOSE",readN:"So far you have turned {n} pages in this Library."}};
+const EMBLEM='<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><polygon points="33.9,12 33.9,28 20,36 6.1,28 6.1,12 20,4" fill="none" stroke="#bd9a5e" stroke-width="1.6"/><polygon points="28.7,15 28.7,25 20,30 11.3,25 11.3,15 20,10" fill="none" stroke="#8f7a52" stroke-width="1"/><circle cx="20" cy="20" r="1.8" fill="#d8b16e"/></svg>';
+function t(k){const L=window.__lang||"zh";return (I18N[L]&&I18N[L][k])||I18N.zh[k]||k}
+function readCount(){try{return +(localStorage.getItem("babel_pages")||0)}catch(_){return 0}}
+function buildAbout(){
+  const ab=document.getElementById("about");if(!ab)return;
+  const n=readCount();
+  ab.querySelector("article").innerHTML=
+   `<h2>${t("abTitle")}${EMBLEM}</h2>`+
+   `<p class="epigraph">${t("epi")}<span>${t("epiBy")}</span></p>`+
+   `<p>${t("ab1")}</p><p>${t("ab2")}</p>`+
+   `<p class="count">${n>0?t("readN").replace("{n}",n):""}</p>`+
+   `<span class="who">${t("keeper")}<a href="https://home.azad.asia/" target="_blank" rel="noopener">Azad</a> · <a href="https://babel.azad.asia/" target="_blank" rel="noopener">${t("blog")}</a></span>`+
+   `<button class="close" type="button">${t("close")}</button>`;
+}
+function openAbout(){buildAbout();const ab=document.getElementById("about");ab.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>ab.classList.add("on")))}
+function closeAbout(){const ab=document.getElementById("about");ab.classList.remove("on");setTimeout(()=>{ab.hidden=true},300)}
+function applyLang(l){
+  window.__lang=l;
+  try{localStorage.setItem("babel_lang",l)}catch(_){}
+  document.documentElement.lang=l==="zh"?"zh-CN":"en";
+  document.body.classList.toggle("en",l==="en");
+  document.title=t("title");
+  const sm=document.querySelector("header small");if(sm)sm.textContent=t("hex");
+  const h1=document.querySelector("h1");if(h1)h1.textContent=t("h1");
+  const ft=document.querySelector("footer");
+  if(ft)ft.innerHTML=`${t("footer")} · <a href="#" id="langBtn">${l==="zh"?"EN":"中文"}</a> · <a href="#" id="about-link">${t("about")}</a>`;
+  const st=document.getElementById("status");
+  if(st&&!st.hidden)st.textContent=t("opening");
+  buildAbout();
+  if(window.__onLang)window.__onLang();
+}
+/* 默认语言：localStorage > IP 判定 > 浏览器语言 */
+(function(){
+  let l=null;try{l=localStorage.getItem("babel_lang")}catch(_){}
+  if(l!=="zh"&&l!=="en"){
+    l=/^en/i.test(navigator.language||"")?"en":"zh";
+    (async()=>{
+      try{
+        const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),1800);
+        const r=await fetch("https://ipwho.is/",{signal:ac.signal});clearTimeout(tm);
+        const j=await r.json(),cc=j&&j.country_code;
+        if(!cc)return;
+        const zhAreas=["CN","TW","HK","MO","SG","MY"];
+        const ip=zhAreas.includes(cc)?"zh":"en";
+        if(ip!==window.__lang)applyLang(ip);
+      }catch(_){}
+    })();
+  }
+  window.__lang=l;
+  applyLang(l);
+})();
+const msg=document.querySelector("#status");
+function fail(text){if(msg){msg.hidden=false;msg.textContent=text}}
+const watchdog=setTimeout(()=>fail(t("wd")),15000);
+document.addEventListener("click",e=>{
+  if(e.target.closest("#langBtn")){e.preventDefault();applyLang(window.__lang==="zh"?"en":"zh");return}
+  if(e.target.closest("#about-link")){e.preventDefault();openAbout();return}
+  const ab=e.target.closest("#about");
+  if(ab&&!ab.hidden&&(e.target===ab||e.target.closest(".close")))closeAbout();
+});
+document.addEventListener("keydown",e=>{
+  const ab=document.getElementById("about");
+  if(e.key==="Escape"&&ab&&!ab.hidden)closeAbout();
+});
+</script>
+<script type="module">
+const mobile=matchMedia("(pointer:coarse)").matches,quiet=matchMedia("(prefers-reduced-motion:reduce)").matches;
+try{const [T,{OrbitControls}]=await Promise.all([import("three"),import("three/addons/controls/OrbitControls.js")]);await run(T,OrbitControls)}
+catch(e){clearTimeout(watchdog);console.error("boot failed",e);fail(t("fail3d")+" · "+((e&&e.message)||"")+" · "+(window.__lang==="en"?"please refresh":"請刷新重試"))}
+async function run(T,OrbitControls){
+const canvas=document.querySelector("canvas"),r=new T.WebGLRenderer({canvas,antialias:true}),scene=new T.Scene(),cam=new T.PerspectiveCamera(57,1,.1,90),ctl=new OrbitControls(cam,canvas);
+r.toneMapping=T.ACESFilmicToneMapping;r.toneMappingExposure=1.12;scene.background=new T.Color(0x050506);scene.fog=new T.FogExp2(0x0a0d10,.042);cam.position.set(0,-.3,-.8);ctl.target.set(0,-.05,0);
+ctl.enableZoom=true;ctl.zoomSpeed=.55;ctl.minDistance=.12;ctl.maxDistance=5.4;
+ctl.enablePan=false;ctl.enableDamping=true;ctl.rotateSpeed=.52;ctl.minPolarAngle=.55;ctl.maxPolarAngle=2.5;ctl.update();
+ctl.autoRotate=!quiet;ctl.autoRotateSpeed=.35;
+const stopAuto=()=>ctl.autoRotate=false;
+canvas.addEventListener("pointerdown",stopAuto,{once:true});
+canvas.addEventListener("wheel",stopAuto,{once:true});
+let post=null,dof=null,aa=null;
+const V=(x=0,y=0,z=0)=>new T.Vector3(x,y,z),std=o=>new T.MeshStandardMaterial(o),tau=Math.PI*2;
+let seed=(Date.now()^(Math.random()*0xFFFFFFFF))>>>0;
+const rnd=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
+const makeRng=s=>{let x=(s>>>0)||1;return()=>{x=Math.imul(x,1664525)+1013904223>>>0;return x/4294967296}};
+const LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const gib=(rg,min,max)=>{const len=min+((rg()*(max-min+1))|0);let s="",w=0;for(let i=0;i<len;i++){s+=LETTERS[(rg()*26)|0];if(++w>=2+(rg()*4|0)&&i<len-1){s+=" ";w=0}}return s};
+function surface(w,h,fn){const c=document.createElement("canvas");c.width=w;c.height=h;fn(c.getContext("2d"),w,h);return c}
+function texture(c){const t2=new T.CanvasTexture(c);t2.colorSpace=T.SRGBColorSpace;t2.anisotropy=Math.min(mobile?4:16,r.capabilities.getMaxAnisotropy());return t2}
+function line(g,x,y,X,Y,col,n=1){g.strokeStyle=col;g.lineWidth=n;g.beginPath();g.moveTo(x,y);g.lineTo(X,Y);g.stroke()}
+
+/* ---- 光 ---- */
+scene.add(new T.HemisphereLight(0xd8d4c8,0x7c8896,.9),new T.AmbientLight(0xb8bfca,.26));
+const key=new T.DirectionalLight(0xffd9a8,1.0);key.position.set(-5,9,4);scene.add(key);
+{const hr=new Date().getHours(),night=hr>=22||hr<5,twi=(hr>=5&&hr<8)||(hr>=17&&hr<21);
+ key.color.set(night?0xffc387:twi?0xffd9a8:0xffdcae);key.intensity*=night?.88:twi?1:.94;scene.fog.color.set(night?0x090c0f:0x0a0d10)}
+r.shadowMap.enabled=true;r.shadowMap.type=T.PCFSoftShadowMap;key.castShadow=true;key.shadow.mapSize.setScalar(mobile?512:1024);Object.assign(key.shadow.camera,{left:-15,right:15,top:15,bottom:-15,far:40});key.shadow.camera.updateProjectionMatrix();key.shadow.normalBias=.025;
+const wash=new T.PointLight(0xffdfb4,10,15,2);wash.position.set(0,1.4,.6);scene.add(wash);
+
+/* ---- 悬灯 ---- */
+const glowTex=texture(surface(128,128,g=>{const d=g.createRadialGradient(64,64,0,64,64,64);d.addColorStop(0,"rgba(255,238,205,1)");d.addColorStop(.25,"rgba(255,214,150,.7)");d.addColorStop(1,"rgba(255,190,110,0)");g.fillStyle=d;g.fillRect(0,0,128,128)}));
+const lamps=[];
+function hangLamp(x,y,z,rad,int,dist,glowS){
+ const top=5.85,g=new T.Group();g.position.set(x,top,z);
+ const Lc=top-y;
+ const cord=new T.Mesh(new T.CylinderGeometry(.008,.008,Lc,6),std({color:0x1a140c,roughness:1}));
+ cord.position.y=-Lc/2;g.add(cord);
+ const shade=new T.Mesh(new T.CylinderGeometry(rad*1.1,rad*3.4,rad*2.6,18,1,true),std({color:0x241a0e,roughness:.5,metalness:.55,side:T.DoubleSide}));
+ shade.position.y=-Lc+rad*1.9;g.add(shade);
+ const ring=new T.Mesh(new T.TorusGeometry(rad*1.2,rad*.18,8,20),std({color:0x3a2a18,roughness:.4,metalness:.6}));
+ ring.rotation.x=Math.PI/2;ring.position.y=-Lc+rad*3.2;g.add(ring);
+ const bulb=new T.Mesh(new T.SphereGeometry(rad*.8,16,12),std({color:0x3a2a14,emissive:0xffc98a,emissiveIntensity:1.7,roughness:.4}));
+ bulb.position.y=-Lc;g.add(bulb);
+ const glow=new T.Sprite(new T.SpriteMaterial({map:glowTex,color:0xffd9a6,transparent:true,opacity:.4,blending:T.AdditiveBlending,depthWrite:false}));
+ glow.scale.set(glowS,glowS*.75,1);glow.position.y=-Lc;g.add(glow);
+ const pl=new T.PointLight(0xffd0a0,int,dist,2);pl.position.y=-Lc;g.add(pl);
+ scene.add(g);lamps.push({g,pl,base:int,ph:rnd()*tau,bulb:V(x,y,z)});
+}
+hangLamp(0,5.35,0,.16,mobile?14:16,15,1.1);
+if(!mobile){hangLamp(5.6,4.05,-3.2,.12,4.5,9,.85);hangLamp(-5.4,3.7,3.4,.12,4.5,9,.85)}
+
+/* ---- 地面：幽暗古石六角砖（哑光近黑，磨旧石面）----
+ * 新样式：近黑暖灰的古石砖体、砖缝沉入阴影，移除发光铜缝与黄铜刻环，
+ * 保留高度场凹凸与磨损噪声；灯光落处只余极轻的暖意，贴合无限幽暗的回廊意象 */
+const floorMat=std({color:0xffffff,roughness:.97});
+floorMat.onBeforeCompile=shader=>{
+  shader.vertexShader=shader.vertexShader
+    .replace('#include <common>','#include <common>\nvarying vec2 stonePos;\nvarying vec3 vWp;')
+    .replace('#include <begin_vertex>','#include <begin_vertex>\nstonePos = position.xy;\nvWp = (modelMatrix*vec4(position,1.)).xyz;');
+  shader.fragmentShader=shader.fragmentShader
+    .replace('#include <common>',`
+    #include <common>
+    varying vec2 stonePos;
+    varying vec3 vWp;
+    float hash21(vec2 q){q=fract(q*vec2(127.1,311.7));q+=dot(q,q+34.23);return fract(q.x*q.y);}
+    float vnoise(vec2 q){
+      vec2 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
+      float a=hash21(i),b=hash21(i+vec2(1.,0.)),c=hash21(i+vec2(0.,1.)),d=hash21(i+vec2(1.,1.));
+      return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
+    }
+    float hexH(vec2 p){
+      vec2 uvp=p/0.68;
+      vec2 hr2=vec2(3.0,1.7320508);
+      vec2 hh2=vec2(1.5,0.8660254);
+      vec2 qa=mod(uvp,hr2)-hh2;
+      vec2 qb=mod(uvp-hh2,hr2)-hh2;
+      vec2 gv2=dot(qa,qa)<dot(qb,qb)?qa:qb;
+      vec2 cid2=uvp-gv2;
+      float E2=max(max(abs(gv2.y),abs(.8660254*gv2.x+.5*gv2.y)),abs(.8660254*gv2.x-.5*gv2.y));
+      float dE2=E2/.80;
+      float h=(1.-smoothstep(.30,1.,dE2))*.030;
+      h+=(hash21(cid2)-.5)*.016;
+      h+=vnoise(p*2.3)*.010;
+      ${mobile?'':'h+=vnoise(p*7.7)*.0045;'}
+      h+=vnoise(p*.4+31.7)*.02;
+      return h;
+    }`)
+    .replace('#include <color_fragment>',`
+    #include <color_fragment>
+    vec2 p=stonePos;
+    float fE;float fhn;vec2 fp;
+    vec2 uvp=p/0.68;
+    vec2 hr=vec2(3.0,1.7320508);
+    vec2 hh=vec2(1.5,0.8660254);
+    vec2 ha=mod(uvp,hr)-hh;
+    vec2 hb=mod(uvp-hh,hr)-hh;
+    vec2 gv=dot(ha,ha)<dot(hb,hb)?ha:hb;
+    vec2 cid=uvp-gv;
+    float E=max(max(abs(gv.y),abs(.8660254*gv.x+.5*gv.y)),abs(.8660254*gv.x-.5*gv.y));
+    float aaE=fwidth(E);
+    float lw=.015+aaE*1.4;
+    float edge=1.-smoothstep(.80-lw,.80,E);
+    float hn=hash21(cid);
+    float dE=E/.80;
+    /* 古石砖体：近黑暖灰双色阶，边缘沉入暗影 */
+    vec3 tile=mix(vec3(.034,.033,.037),vec3(.060,.057,.060),hn);
+    tile*=1.-.22*smoothstep(.30,1.0,dE);
+    float fade=1.-smoothstep(8.,18.,distance(vWp,cameraPosition));
+    float mo=vnoise(p*1.35+hn*23.17);
+    tile*=mix(1.,.92+.13*mo,fade);
+    tile*=.96+.06*vnoise(p*.5+7.);
+    vec3 base=mix(vec3(.002,.002,.003),tile,edge);
+    diffuseColor.rgb=base;
+    fE=dE;fhn=hn;fp=p;`)
+    .replace('#include <roughnessmap_fragment>',`
+    float roughnessFactor=clamp(roughness*(0.88+0.16*vnoise(fp*1.1+3.1))+0.08*smoothstep(.90,1.12,fE)+0.04*fhn,0.55,1.0);`)
+    .replace('#include <normal_fragment_maps>',`
+    #include <normal_fragment_maps>
+    {
+      float be=0.02;
+      float h0=hexH(fp);
+      float hX=hexH(fp+vec2(be,0.0));
+      float hZ=hexH(fp+vec2(0.0,-be));
+      vec3 wN=normalize(vec3((h0-hX)/be*1.8,1.0,(h0-hZ)/be*1.8));
+      normal=normalize(mat3(viewMatrix)*wN);
+    }`);
+};
+const floor=new T.Mesh(new T.PlaneGeometry(44,44),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-4;floor.receiveShadow=true;scene.add(floor);
+
+/* ---- 木纹 ---- */
+const woodC=surface(512,512,(g,w,h)=>{
+  g.fillStyle="#54402e";g.fillRect(0,0,w,h);
+  for(let y=0;y<h;y+=128){const t2=rnd()*.09;g.fillStyle=t2<.05?`rgba(0,0,0,${(.04+rnd()*.06).toFixed(3)})`:`rgba(120,88,58,${t2.toFixed(3)})`;g.fillRect(0,y,w,128)}
+  for(let i=0;i<420;i++){const y=rnd()*h;g.strokeStyle=`rgba(${(26+rnd()*26)|0},${(18+rnd()*18)|0},${(10+rnd()*12)|0},${(.06+rnd()*.1).toFixed(3)})`;g.lineWidth=.6+rnd()*1.6;g.beginPath();let x=0;g.moveTo(0,y);while(x<w){x+=10+rnd()*26;g.lineTo(x,y+(rnd()-.5)*7)}g.stroke()}
+  for(let x=0;x<w;x+=128){g.fillStyle="rgba(14,9,5,.42)";g.fillRect(x,0,2,h);g.fillStyle="rgba(190,150,105,.05)";g.fillRect(x+2,0,1,h)}
+  for(let i=0;i<6;i++){const x=rnd()*w,y=rnd()*h,rad=4+rnd()*7;const kg=g.createRadialGradient(x,y,1,x,y,rad);kg.addColorStop(0,"rgba(30,20,12,.55)");kg.addColorStop(1,"rgba(30,20,12,0)");g.fillStyle=kg;g.beginPath();g.arc(x,y,rad,0,7);g.fill()}
+  for(let i=0;i<2200;i++){g.fillStyle=rnd()<.5?"rgba(20,13,7,.10)":"rgba(190,150,105,.06)";g.fillRect(rnd()*w,rnd()*h,1+rnd()*2,1)}
+});
+const woodTex=texture(woodC);
+const woodBump=new T.CanvasTexture(woodC);woodBump.colorSpace=T.NoColorSpace;
+const woodMat=std({map:woodTex,bumpMap:woodBump,bumpScale:.35,roughness:.85});
+
+/* ---- 书脊制式（五种西式） ---- */
+function spineCanvas(rng,style){
+  const W=96,H=512;
+  return surface(W,H,g=>{
+    const palettes=[[[96,34,28],[30,62,48],[46,54,86],[64,46,28],[40,36,36]],
+                    [[62,68,74],[88,64,46],[54,60,46],[72,60,74],[46,50,58]],
+                    [[152,88,54],[72,98,122],[94,112,72],[142,122,72],[112,62,68]],
+                    [[90,86,60],[112,98,72],[76,74,56]],
+                    [[36,32,30],[52,40,30],[30,40,38]]];
+    const pal=palettes[style],base=pal[(rng()*pal.length)|0];
+    const gr=g.createLinearGradient(0,0,0,H);
+    gr.addColorStop(0,`rgb(${base[0]+14},${base[1]+12},${base[2]+10})`);
+    gr.addColorStop(.5,`rgb(${base[0]},${base[1]},${base[2]})`);
+    gr.addColorStop(1,`rgb(${(base[0]*.72)|0},${(base[1]*.72)|0},${(base[2]*.72)|0})`);
+    g.fillStyle=gr;g.fillRect(0,0,W,H);
+    for(let i=0;i<900;i++){g.fillStyle=rng()<.5?"rgba(255,240,210,.06)":"rgba(0,0,0,.10)";g.fillRect(rng()*W,rng()*H,1+rng()*2,1)}
+    g.fillStyle="rgba(0,0,0,.35)";g.fillRect(0,0,6,H);g.fillRect(W-6,0,6,H);
+    const title=gib(rng,5,11);
+    g.save();g.translate(W/2,H/2);g.rotate(Math.PI/2);g.textAlign="center";g.textBaseline="middle";
+    if(style===0||style===4){
+      g.fillStyle="rgba(216,180,110,.9)";g.fillRect(8,44,W-16,10);g.fillRect(8,H-54,W-16,10);
+      g.strokeStyle="rgba(216,180,110,.65)";g.lineWidth=1.6;g.strokeRect(10,62,W-20,H-124);
+      g.fillStyle="#dcb76e";g.font='600 30px Georgia,"Times New Roman",serif';g.fillText(title,0,8);
+      g.fillStyle="rgba(216,180,110,.8)";
+      g.save();g.translate(0,-150);g.rotate(Math.PI/4);g.fillRect(-5,-5,10,10);g.restore();
+      g.save();g.translate(0,150);g.rotate(Math.PI/4);g.fillRect(-5,-5,10,10);g.restore();
+    }else if(style===1){
+      g.fillStyle="#e2d4ac";g.fillRect(20,150,W-40,212);
+      g.strokeStyle="#8a744e";g.lineWidth=2;g.strokeRect(23,153,W-46,206);
+      g.fillStyle="#3a2e1e";g.font='600 26px Georgia,serif';g.fillText(title,0,6);
+    }else if(style===2){
+      g.fillStyle="#efe6cf";g.font='600 26px Georgia,serif';g.fillText(title,0,4);
+      g.fillStyle="rgba(239,230,207,.8)";g.fillRect(12,60,W-24,4);g.fillRect(12,H-64,W-24,4);
+    }else{
+      g.fillStyle="#161310";g.fillRect(14,26,W-28,74);
+      g.fillStyle="#d8cba6";g.font='12px Georgia,serif';g.fillText("HEX-"+((rng()*89+10)|0)+"-"+((rng()*89+10)|0),0,63);
+      g.fillStyle="#e4d8b4";g.font='600 24px Georgia,serif';g.fillText(title,0,40);
+    }
+    g.restore();
+  });
+}
+const shelfSpineMat=[];
+for(let st=0;st<5;st++){shelfSpineMat[st]=[];for(let v=0;v<2;v++)shelfSpineMat[st][v]=std({map:texture(spineCanvas(makeRng((st*7+v)*131+17),st)),roughness:.82})}
+const pagesTex=texture(surface(96,96,g=>{g.fillStyle="#d8c9a2";g.fillRect(0,0,96,96);for(let y=3;y<96;y+=4)line(g,0,y,96,y,"rgba(120,96,60,.28)");for(let i=0;i<80;i++){g.fillStyle="rgba(90,70,44,.12)";g.fillRect(Math.random()*96,Math.random()*96,1,1)}}));
+const pagesMat=std({map:pagesTex,roughness:.95});
+
+/* ---- 下一间回廊剪影纹理 ---- */
+const silTex=texture(surface(256,256,(g,w,h)=>{
+  g.fillStyle="#0a0d0f";g.fillRect(0,0,w,h);
+  for(let row=0;row<5;row++){const y=30+row*46;
+    for(let x=6;x<w-6;){const bw=6+rnd()*14,hh=22+rnd()*16;
+      g.fillStyle=`rgba(${118+rnd()*30|0},${104+rnd()*25|0},${70+rnd()*20|0},${(.10+rnd()*.13).toFixed(3)})`;
+      g.fillRect(x,y-hh,bw,hh);x+=bw+2}
+    g.fillStyle="rgba(190,160,110,.10)";g.fillRect(0,y,w,2)}
+}));
+
+/* ---- 六角书墙 ---- */
+const B=11.3;
+const frameP=[],volArr=[];
+for(let st=0;st<5;st++){volArr[st]=[];for(let v=0;v<2;v++)volArr[st][v]=[]}
+const dummy=new T.Object3D(),tint=[0xffffff,0xdcd4c4,0xc9c0b2,0xeee6d6,0xaba396];
+function put(t2,y,u,ry,w,h,d,arr,col){
+  dummy.position.set(Math.sin(ry)*(B+u)+Math.cos(ry)*t2, y, Math.cos(ry)*(B+u)-Math.sin(ry)*t2);
+  dummy.rotation.set(0,ry,0);dummy.scale.set(w,h,d);dummy.updateMatrix();
+  arr.push([dummy.matrix.clone(),col]);
+}
+function fillShelf(yb,xa0,xa1,ry,arr){
+  const dir=xa1>xa0?1:-1;
+  let xa=xa0;
+  while(dir>0?xa<xa1:xa>xa1){
+    if(rnd()<.1&&Math.abs(xa)>3.4){
+      const lw=.8+rnd()*.3,lh=.15+rnd()*.05;
+      put(xa+dir*lw/2,yb+lh/2+.03,.15,ry,lw,lh,.55+rnd()*.2,arr,tint[(rnd()*tint.length)|0]);
+      xa+=dir*(lw+.03);
+    }else{
+      const w=.13+rnd()*.2,h=.6+rnd()*.42;
+      put(xa+dir*w/2,yb+h/2+.06,.15,ry,w,h,.5+rnd()*.26,arr,tint[(rnd()*tint.length)|0]);
+      xa+=dir*(w+.025);
+    }
+  }
+}
+const rowsLow=[-3.45,-2.2,-.95,.3],rowsHigh=[1.55,2.8,4.05];
+for(let k=0;k<6;k++){
+  const a=k/6*tau;
+  for(const s of [-1,1]){
+    put(s*6.5,1.05,.05,a,.34,10.2,1.2,frameP,0xffffff);
+    put(s*1.9,1.05,.05,a,.26,10.2,1.2,frameP,0xffffff);
+    for(const yb of rowsLow){
+      put(s*4.2,yb-.075,0,a,4.2,.14,1.12,frameP,0xffffff);
+      fillShelf(yb,s*6.2,s*2.25,a,volArr[(rnd()*5)|0][(rnd()*2)|0]);
+    }
+  }
+  put(0,1.235,0,a,4.1,.45,1.2,frameP,0xffffff);
+  for(const yb of rowsHigh){
+    put(0,yb-.075,0,a,12.6,.14,1.12,frameP,0xffffff);
+    fillShelf(yb,-6.2,6.15,a,volArr[(rnd()*5)|0][(rnd()*2)|0]);
+  }
+  for(const s of [-1,1])put(s*4.18,1.05,.64,a,4.3,10.2,.12,frameP,0xffffff);
+  put(0,3.82,.64,a,13.7,4.66,.12,frameP,0xffffff);
+  put(0,5.3,0,a,13.7,.2,1.3,frameP,0xffffff);
+  put(0,5.55,0,a,14.0,.14,1.5,frameP,0xffffff);
+  put(0,5.82,0,a,13.35,.26,.38,frameP,0xffffff);
+  const sil=new T.Mesh(new T.PlaneGeometry(9,9.5),new T.MeshBasicMaterial({map:silTex,color:0x8d8168}));
+  sil.position.set(Math.sin(a)*(B+9.5),-.1,Math.cos(a)*(B+9.5));
+  sil.rotation.y=a+Math.PI;scene.add(sil);
+}
+function buildIM(arr,mat){const im=new T.InstancedMesh(new T.BoxGeometry(),mat,arr.length);arr.forEach(([m,col],i)=>{im.setMatrixAt(i,m);im.setColorAt(i,new T.Color(col))});im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.castShadow=im.receiveShadow=true;return im}
+scene.add(buildIM(frameP,woodMat));
+const shelfGeo=new T.BoxGeometry(1,1,1);
+for(let st=0;st<5;st++)for(let v=0;v<2;v++){const arr=volArr[st][v];
+  if(arr.length){const im=new T.InstancedMesh(shelfGeo,[pagesMat,pagesMat,pagesMat,pagesMat,pagesMat,shelfSpineMat[st][v]],arr.length);
+   arr.forEach(([m,col],i)=>{im.setMatrixAt(i,m);im.setColorAt(i,new T.Color(col))});
+   im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;
+   im.castShadow=im.receiveShadow=true;scene.add(im)}}
+
+/* ---- 漂浮之书（种子随机）---- */
+const coverCols={leather:[[96,34,28],[30,62,48],[46,54,86],[64,46,28],[40,36,36],[74,54,24]],
+                 cloth:[[62,68,74],[88,64,46],[54,60,46],[72,60,74],[46,50,58]],
+                 paper:[[152,88,54],[72,98,122],[94,112,72],[142,122,72],[112,62,68]],
+                 lib:[[90,86,60],[112,98,72],[76,74,56]]};
+function coverCanvas(rng,style){
+  const W=256,H=352,title=gib(rng,4,10);
+  const c=surface(W,H,g=>{
+    let base;
+    if(style===0)base=coverCols.leather[(rng()*6)|0];
+    else if(style===1)base=coverCols.cloth[(rng()*5)|0];
+    else if(style===2)base=coverCols.paper[(rng()*5)|0];
+    else base=coverCols.lib[(rng()*3)|0];
+    const gr=g.createLinearGradient(0,0,0,H);
+    gr.addColorStop(0,`rgb(${Math.min(255,base[0]+16)},${Math.min(255,base[1]+14)},${Math.min(255,base[2]+12)})`);
+    gr.addColorStop(.55,`rgb(${base[0]},${base[1]},${base[2]})`);
+    gr.addColorStop(1,`rgb(${(base[0]*.7)|0},${(base[1]*.7)|0},${(base[2]*.7)|0})`);
+    g.fillStyle=gr;g.fillRect(0,0,W,H);
+    for(let i=0;i<1300;i++){g.fillStyle=rng()<.5?"rgba(255,240,210,.05)":"rgba(0,0,0,.09)";g.fillRect(rng()*W,rng()*H,1+rng()*2,1)}
+    const fold=g.createLinearGradient(0,0,18,0);fold.addColorStop(0,"rgba(0,0,0,.4)");fold.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=fold;g.fillRect(0,0,18,H);
+    g.fillStyle="rgba(0,0,0,.3)";g.fillRect(W-5,0,5,H);g.fillRect(0,0,W,5);g.fillRect(0,H-5,W,5);
+    g.textAlign="center";g.textBaseline="middle";
+    const lines=title.split(" ");
+    if(style===0){
+      g.strokeStyle="rgba(216,180,110,.8)";g.lineWidth=2;g.strokeRect(16,16,W-32,H-32);
+      g.strokeStyle="rgba(216,180,110,.4)";g.lineWidth=1;g.strokeRect(22,22,W-44,H-44);
+      g.fillStyle="#dcb76e";g.font='600 27px Georgia,"Times New Roman",serif';
+      lines.forEach((ln,i)=>g.fillText(ln,W/2,H/2-14+(i-(lines.length-1)/2)*34));
+      g.save();g.translate(W/2,H/2+64);g.rotate(Math.PI/4);g.fillStyle="rgba(216,180,110,.85)";g.fillRect(-6,-6,12,12);g.restore();
+      g.fillStyle="rgba(216,180,110,.5)";g.font='11px Georgia,serif';g.fillText("B I B L I O T H E C A",W/2,H-44);
+    }else if(style===1){
+      g.strokeStyle="rgba(230,220,190,.25)";g.lineWidth=1;g.strokeRect(12,12,W-24,H-24);
+      g.fillStyle="#e2d4ac";g.fillRect(48,86,160,150);
+      g.strokeStyle="#8a744e";g.lineWidth=2;g.strokeRect(52,90,152,142);
+      g.fillStyle="#3a2e1e";g.font='600 24px Georgia,serif';
+      lines.forEach((ln,i)=>g.fillText(ln,W/2,161+(i-(lines.length-1)/2)*30));
+      g.fillStyle="#9e3a2c";g.fillRect(W/2-11,H-92,22,22);
+      g.fillStyle="rgba(238,226,198,.85)";g.fillRect(W/2-6,H-87,12,12);
+    }else if(style===2){
+      g.fillStyle="#e9dfc6";g.fillRect(0,H*.62,W,H*.38);
+      g.strokeStyle="rgba(30,24,16,.5)";g.lineWidth=3;g.strokeRect(8,8,W-16,H-16);
+      g.fillStyle="#efe6cf";g.fillRect(0,0,W,H*.1);
+      g.fillStyle="#241c12";g.font='600 28px Georgia,serif';
+      lines.forEach((ln,i)=>g.fillText(ln,W/2,H*.72+(i-(lines.length-1)/2)*32));
+      g.fillStyle="rgba(36,28,18,.55)";g.font='11px Georgia,serif';g.fillText("B A B E L",W/2,H-30);
+    }else{
+      g.fillStyle="#161310";g.fillRect(24,28,120,54);
+      g.fillStyle="#d8cba6";g.font='13px Georgia,serif';g.fillText("HEX-"+((rng()*89+10)|0)+"-"+((rng()*89+10)|0),84,58);
+      g.strokeStyle="rgba(230,220,190,.3)";g.lineWidth=1;g.strokeRect(14,14,W-28,H-28);
+      g.fillStyle="#e4d8b4";g.font='600 25px Georgia,serif';
+      lines.forEach((ln,i)=>g.fillText(ln,W/2,H*.5+(i-(lines.length-1)/2)*30));
+    }
+  });
+  return {c,title,base:c.getContext("2d").getImageData(128,40,1,1).data};
+}
+const geo=new T.BoxGeometry(.75,1.06,.17);
+const spineMats=[];for(let st=0;st<5;st++)spineMats.push(shelfSpineMat[st][0]);
+const books=[];
+const EMI_BASE=.05,EMI_HOT=.3;
+const NF1=mobile?10:16,NF2=mobile?8:14,NF_OUT=mobile?8:14;
+function addFloater(i,r,y,ang,sc){
+  const sd=((Math.random()*0x7FFFFFFF)|0)||1;
+  const rg=makeRng(sd),style=(rg()*4)|0;
+  const pages=2*(48+((rg()*360)|0));
+  const cc=coverCanvas(rg,style);
+  const faceMat=std({map:texture(cc.c),roughness:.72,emissive:0x332b1e,emissiveIntensity:EMI_BASE});
+  faceMat.emissiveMap=faceMat.map;
+  const backC=surface(96,128,g=>{const b=cc.base;g.fillStyle=`rgb(${(b[0]*.72)|0},${(b[1]*.72)|0},${(b[2]*.72)|0})`;g.fillRect(0,0,96,128);g.strokeStyle="rgba(0,0,0,.3)";g.strokeRect(4,4,88,120)});
+  const backMat=std({map:texture(backC),roughness:.8,emissive:0x2a2418,emissiveIntensity:EMI_BASE*.8});
+  backMat.emissiveMap=backMat.map;
+  const m=new T.Mesh(geo,[pagesMat,spineMats[(rg()*5)|0],pagesMat,pagesMat,faceMat,backMat]);
+  m.position.set(r*Math.sin(ang),y,r*Math.cos(ang));
+  const baseRot=ang+Math.PI+(rg()-.5)*1.2;
+  m.rotation.set((rg()-.5)*.5,baseRot,(rg()-.5)*.4);
+  m.scale.setScalar(sc);
+  m.castShadow=m.receiveShadow=true;
+  m.userData={title:cc.title,seed:sd,pages,baseCol:[cc.base[0],cc.base[1],cc.base[2]],coverCanvas:cc.c,
+    face:faceMat,back:backMat,base:m.position.clone(),
+    fF:.3+rg()*.4,fP:rg()*tau,fA:.09+rg()*.13,rF:.12+rg()*.25,rP:rg()*tau,sc,baseRot,
+    veiled:false,sent:false};
+  scene.add(m);books.push(m);
+}
+let fi=0;
+for(let i=0;i<NF1;i++)addFloater(fi++,1.4+rnd()*3.2,-3.1+rnd()*8.1,rnd()*tau,.5+rnd()*.6);
+for(let i=0;i<NF2;i++)addFloater(fi++,4.8+rnd()*4.0,-3.1+rnd()*8.1,rnd()*tau,.55+rnd()*.6);
+for(let i=0;i<NF_OUT;i++){
+  const doorAligned=i<6,ang=doorAligned?((i+.28)/6*tau+(rnd()-.5)*.24):rnd()*tau;
+  const y=doorAligned?(-2.4+rnd()*3.2):(i%2?6.4+rnd()*2.9:-2.5+rnd()*4.2);
+  addFloater(fi++,13.8+rnd()*7.5,y,ang,.6+rnd()*.7);
+}
+
+/* ---- 固定之书：The Library of Babel（博尔赫斯，英文版）----
+ * 与他书一样随机漂浮，唯此卷书名、封面与内容固定；
+ * 封面带微微光亮（自发光 + 微光晕），若恰悬于玄灯正下，则被照得透亮 */
+const BABEL_TITLE="The Library of Babel";
+const BABEL_PAGES=["         By this art you may\n     contemplate the variation of\n          the 23 letters....\n\n   — Anatomy of Melancholy, Pt. 2,\n            Sec. II, Mem. IV\n\n\nThe universe (which others call the\nLibrary) is composed of an indefinite,\nperhaps infinite number of hexagonal\ngalleries. In the center of each\ngallery is a ventilation shaft,\nbounded by a low railing. From any\nhexagon one can see the floors above", "and below—one after another,\nendlessly. The arrangement of the\ngalleries is always the same: Twenty\nbookshelves, five to each side, line\nfour of the hexagon's six sides; the\nheight of the bookshelves, floor to\nceiling, is hardly greater than the\nheight of a normal librarian. One of\nthe hexagon's free sides opens onto a\nnarrow sort of vestibule, which in\nturn opens onto another gallery,\nidentical to the first—identical in\nfact to all. To the left and right of\nthe vestibule are two tiny\ncompartments. One is for sleeping,", "upright; the other, for satisfying\none's physical necessities. Through\nthis space, too, there passes a spiral\nstaircase, which winds upward and\ndownward into the remotest distance.\n\nIn the vestibule there is a mirror,\nwhich faithfully duplicates\nappearances. Men often infer from this\nmirror that the Library is not\ninfinite—if it were, what need would\nthere be for that illusory\nreplication? I prefer to dream that\nburnished surfaces are a figuration\nand promise of the infinite...", "Light is provided by certain spherical\nfruits that bear the name \"bulbs.\"\nThere are two of these bulbs in each\nhexagon, set crosswise. The light they\ngive is insufficient, and unceasing.\n\nLike all the men of the Library, in my\nyounger days I traveled; I have\njourneyed in quest of a book, perhaps\nthe catalog of catalogs. Now that my\neyes can hardly make out what I myself\nhave written, I am preparing to die, a\nfew leagues from the hexagon where I\nwas born. When I am dead,\ncompassionate hands will throw me over", "the railing; my tomb will be the\nunfathomable air, my body will sink\nfor ages, and will decay and dissolve\nin the wind engendered by my fall,\nwhich shall be infinite. I declare\nthat the Library is endless. Idealists\nargue that the hexagonal rooms are the\nnecessary shape of absolute space, or\nat least of our perception of space.\nThey argue that a triangular or\npentagonal chamber is inconceivable.\n(Mystics claim that their ecstasies\nreveal to them a circular chamber\ncontaining an enormous circular book\nwith a continuous spine that goes", "completely around the walls. But their\ntestimony is suspect, their words\nobscure. That cyclical book is God.)\nLet it suffice for the moment that I\nrepeat the classic dictum: The Library\nis a sphere whose exact center is any\nhexagon and whose circumference is\nunattainable.\n\nEach wall of each hexagon is furnished\nwith five bookshelves; each bookshelf\nholds thirty-two books identical in\nformat; each book contains four\nhundred ten pages; each page, forty\nlines; each line, approximately eighty", "black letters. There are also letters\non the front cover of each book; those\nletters neither indicate nor prefigure\nwhat the pages inside will say. I am\naware that that lack of correspondence\nonce struck men as mysterious.\n\nBefore summarizing the solution of the\nmystery (whose discovery, in spite of\nits tragic consequences, is perhaps\nthe most important event in all\nhistory), I wish to recall a few\naxioms.\n\nFirst: The Library has existed ab", "æternitate. That truth, whose\nimmediate corollary is the future\neternity of the world, no rational\nmind can doubt. Man, the imperfect\nlibrarian, may be the work of chance\nor of malevolent demiurges; the\nuniverse, with its elegant\nappointments—its bookshelves, its\nenigmatic books, its indefatigable\nstaircases for the traveler, and its\nwater closets for the seated\nlibrarian—can only be the handiwork of\na god. In order to grasp the distance\nthat separates the human and the\ndivine, one has only to compare these", "crude trembling symbols which my\nfallible hand scrawls on the cover of\na book with the organic letters\ninside—neat, delicate, deep black, and\ninimitably symmetrical.\n\nSecond: There are twenty-five\northographic symbols. [1] That\ndiscovery enabled mankind, three\nhundred years ago, to formulate a\ngeneral theory of the Library and\nthereby satisfactorily solve the\nriddle that no conjecture had been\nable to divine—the formless and\nchaotic nature of virtually all books.", "One book, which my father once saw in\na hexagon in circuit 15-94, consisted\nof the letters M C V perversely\nrepeated from the first line to the\nlast. Another (much consulted in this\nzone) is a mere labyrinth of letters\nwhose penultimate page contains the\nphrase O Time thy pyramids. This much\nis known: For every rational line or\nforthright statement there are leagues\nof senseless cacophony, verbal\nnonsense, and incoherency. (I know of\none semibarbarous zone whose\nlibrarians repudiate the \"vain and\nsuperstitious habit\" of trying to find", "sense in books, equating such a quest\nwith attempting to find meaning in\ndreams or in the chaotic lines of the\npalm of one's hand... They will\nacknowledge that the inventors of\nwriting imitated the twenty-five\nnatural symbols, but contend that that\nadoption was fortuitous, coincidental,\nand that books in themselves have no\nmeaning. That argument, as we shall\nsee, is not entirely fallacious.)\n\nFor many years it was believed that\nthose impenetrable books were in\nancient or far-distant languages. It", "is true that the most ancient peoples,\nthe first librarians, employed a\nlanguage quite different from the one\nwe speak today; it is true that a few\nmiles to the right, our language\ndevolves into dialect and that ninety\nfloors above, it becomes\nincomprehensible. All of that, I\nrepeat, is true—but four hundred ten\npages of unvarying M C V's cannot\nbelong to any language, however\ndialectal or primitive it may be. Some\nhave suggested that each letter\ninfluences the next, and that the\nvalue of M C V on page 71, line 3, is", "not the value of the same series on\nanother line of another page, but that\nvague thesis has not met with any\ngreat acceptance. Others have\nmentioned the possibility of codes;\nthat conjecture has been universally\naccepted, though not in the sense in\nwhich its originators formulated it.\n\nSome five hundred years ago, the chief\nof one of the upper hexagons came\nacross a book as jumbled as all the\nothers, but containing almost two\npages of homogeneous lines. He showed\nhis find to a traveling decipherer,", "who told him that the lines were\nwritten in Portuguese; others said it\nwas Yiddish. Within the century\nexperts had determined what the\nlanguage actually was: a\nSamoyed-Lithuanian dialect of Guarani,\nwith inflections from classical\nArabic. The content was also\ndetermined: the rudiments of\ncombinatory analysis, illustrated with\nexamples of endlessly repeating\nvariations. Those examples allowed a\nlibrarian of genius to discover the\nfundamental law of the Library. This\nphilosopher observed that all books,", "however different from one another\nthey might be, consist of identical\nelements: the space, the period, the\ncomma, and the twenty-two letters of\nthe alphabet. He also posited a fact\nwhich all travelers have since\nconfirmed: In all the Library, there\nare no two identical books. From those\nincontrovertible premises, the\nlibrarian deduced that the Library is\n\"total\"—perfect, complete, and\nwhole—and that its bookshelves contain\nall possible combinations of the\ntwenty-two orthographic symbols (a\nnumber which, though unimaginably", "vast, is not infinite)—that is, all\nthat is able to be expressed, in every\nlanguage. All—the detailed history of\nthe future, the autobiographies of the\narchangels, the faithful catalog of\nthe Library, thousands and thousands\nof false catalogs, the proof of the\nfalsity of those false catalogs, a\nproof of the falsity of the true\ncatalog, the gnostic gospel of\nBasilides, the commentary upon that\ngospel, the commentary on the\ncommentary on that gospel, the true\nstory of your death, the translation\nof every book into every language, the", "interpolations of every book into all\nbooks, the treatise Bede could have\nwritten (but did not) on the mythology\nof the Saxon people, the lost books of\nTacitus.\n\nWhen it was announced that the Library\ncontained all books, the first\nreaction was unbounded joy. All men\nfelt themselves the possessors of an\nintact and secret treasure. There was\nno personal problem, no world problem,\nwhose eloquent solution did not\nexist—somewhere in some hexagon. The\nuniverse was justified; the universe", "suddenly became congruent with the\nunlimited width and breadth of\nhumankind's hope.\n\nAt that period there was much talk of\nThe Vindications—books of apologiæ and\nprophecies that would vindicate for\nall time the actions of every person\nin the universe and that held wondrous\narcana for men's futures. Thousands of\ngreedy individuals abandoned their\nsweet native hexagons and rushed\ndownstairs, upstairs, spurred by the\nvain desire to find their Vindication.\nThese pilgrims squabbled in the narrow", "corridors, muttered dark imprecations,\nstrangled one another on the divine\nstaircases, threw deceiving volumes\ndown ventilation shafts, were\nthemselves hurled to their deaths by\nmen of distant regions. Others went\ninsane... The Vindications do exist (I\nhave seen two of them, which refer to\npersons in the future, persons perhaps\nnot imaginary), but those who went in\nquest of them failed to recall that\nthe chance of a man's finding his own\nVindication, or some perfidious\nversion of his own, can be calculated\nto be zero.", "At that same period there was also\nhope that the fundamental mysteries of\nmankind—the origin of the Library and\nof time—might be revealed. In all\nlikelihood those profound mysteries\ncan indeed be explained in words; if\nthe language of the philosophers is\nnot sufficient, then the multiform\nLibrary must surely have produced the\nextraordinary language that is\nrequired, together with the words and\ngrammar of that language. For four\ncenturies, men have been scouring the\nhexagons... There are official\nsearchers, the \"inquisitors.\" I have", "seen them about their tasks: they\narrive exhausted at some hexagon, they\ntalk about a staircase that nearly\nkilled them—rungs were missing—they\nspeak with the librarian about\ngalleries and staircases, and, once in\na while, they take up the nearest book\nand leaf through it, searching for\ndisgraceful or dishonorable words.\nClearly, no one expects to discover\nanything.\n\nThat unbridled hopefulness was\nsucceeded, naturally enough, by a\nsimilarly disproportionate depression.", "The certainty that some bookshelf in\nsome hexagon contained precious books,\nyet that those precious books were\nforever out of reach, was almost\nunbearable. One blasphemous sect\nproposed that the searches be\ndiscontinued and that all men shuffle\nletters and symbols until those\ncanonical books, through some\nimprobable stroke of chance, had been\nconstructed. The authorities were\nforced to issue strict orders. The\nsect disappeared, but in my childhood\nI have seen old men who for long\nperiods would hide in the latrines", "with metal disks and a forbidden dice\ncup, feebly mimicking the divine\ndisorder.\n\nOthers, going about it in the opposite\nway, thought the first thing to do was\neliminate all worthless books. They\nwould invade the hexagons, show\ncredentials that were not always\nfalse, leaf disgustedly through a\nvolume, and condemn entire walls of\nbooks. It is to their hygienic,\nascetic rage that we lay the senseless\nloss of millions of volumes. Their\nname is execrated today, but those who", "grieve over the \"treasures\" destroyed\nin that frenzy overlook two widely\nacknowledged facts: One, that the\nLibrary is so huge that any reduction\nby human hands must be infinitesimal.\nAnd two, that each book is unique and\nirreplaceable, but (since the Library\nis total) there are always several\nhundred thousand imperfect\nfacsimiles—books that differ by no\nmore than a single letter, or a comma.\n\nDespite general opinion, I daresay\nthat the consequences of the\ndepredations committed by the", "Purifiers have been exaggerated by the\nhorror those same fanatics inspired.\nThey were spurred on by the holy zeal\nto reach—someday, through unrelenting\neffort—the books of the Crimson\nHexagon—books smaller than natural\nbooks, books omnipotent, illustrated,\nand magical.\n\nWe also have knowledge of another\nsuperstition from that period: belief\nin what was termed the Book-Man. On\nsome shelf in some hexagon, it was\nargued, there must exist a book that\nis the cipher and perfect compendium", "of all other books, and some librarian\nmust have examined that book; this\nlibrarian is analogous to a god. In\nthe language of this zone there are\nstill vestiges of the sect that\nworshiped that distant librarian. Many\nhave gone in search of Him. For a\nhundred years, men beat every possible\npath—and every path in vain. How was\none to locate the idolized secret\nhexagon that sheltered Him? Someone\nproposed searching by regression: To\nlocate book A, first consult book B,\nwhich tells where book A can be found;\nto locate book B, first consult book", "C, and so on, to infinity...\n\nIt is in ventures such as these that I\nhave squandered and spent my years. I\ncannot think it unlikely that there is\nsuch a total book on some shelf in the\nuniverse. I pray to the unknown gods\nthat some man—even a single man, tens\nof centuries ago—has perused and read\nthat book. If the honor and wisdom and\njoy of such a reading are not to be my\nown, then let them be for others. Let\nheaven exist, though my own place be\nin hell. Let me be tortured and\nbattered and annihilated, but let", "there be one instant, one creature,\nwherein thy enormous Library may find\nits justification.\n\nInfidels claim that the rule in the\nLibrary is not \"sense;\" but\n\"non-sense;\" and that \"rationality\"\n(even humble, pure coherence) is an\nalmost miraculous exception. They\nspeak, I know, of \"the feverish\nLibrary, whose random volumes\nconstantly threaten to transmogrify\ninto others, so that they affirm all\nthings, deny all things, and confound\nand confuse all things, like some mad", "and hallucinating deity.\" Those words,\nwhich not only proclaim disorder but\nexemplify it as well, prove, as all\ncan see, the infidels' deplorable\ntaste and desperate ignorance. For\nwhile the Library contains all verbal\nstructures, all the variations allowed\nby the twenty-five orthographic\nsymbols, it includes not a single\nabsolute piece of nonsense.\n\nIt would be pointless to observe that\nthe finest volume of all the many\nhexagons that I myself administer is\ntitled Combed Thunder, while another", "is titled The Plaster Cramp, and\nanother, Axaxaxas mlö. Those phrases,\nat first apparently incoherent, are\nundoubtedly susceptible to\ncryptographic or allegorical\n\"reading\"; that reading, that\njustification of the words' order and\nexistence, is itself verbal and, ex\nhypothesi, already contained somewhere\nin the Library. There is no\ncombination of characters one can\nmake—dhcmrlchtdj, for example—that the\ndivine Library has not foreseen and\nthat in one or more of its secret\ntongues does not hide a terrible", "significance. There is no syllable one\ncan speak that is not filled with\ntenderness and terror, that is not, in\none of those languages, the mighty\nname of a god. To speak is to commit\ntautologies. This pointless, verbose\nepistle already exists in one of the\nthirty volumes of the five bookshelves\nin one of the countless hexagons—as\ndoes its refutation. (A number n of\nthe possible languages employ the same\nvocabulary; in some of them, the\nsymbol \"library\" possesses the correct\ndefinition \"everlasting, ubiquitous\nsystem of hexagonal galleries,\" while", "a library—the thing—is a loaf of bread\nor a pyramid or something else, and\nthe six words that define it\nthemselves have other definitions. You\nwho read me—are you certain you\nunderstand my language?)\n\nMethodical composition distracts me\nfrom the present condition of\nhumanity. The certainty that\neverything has already been written\nannuls us, or renders us phantasmal. I\nknow districts in which the young\npeople prostrate themselves before\nbooks and like savages kiss their", "pages, though they cannot read a\nletter. Epidemics, heretical discords,\npilgrimages that inevitably degenerate\ninto brigandage have decimated the\npopulation. I believe I mentioned the\nsuicides, which are more and more\nfrequent every year. I am perhaps\nmisled by old age and fear, but I\nsuspect that the human species—the\nonly species—teeters at the verge of\nextinction, yet that the\nLibrary—enlightened, solitary,\ninfinite, perfectly unmoving, armed\nwith precious volumes, pointless,\nincorruptible, and secret—will endure.", "I have just written the word\n\"infinite.\" I have not included that\nadjective out of mere rhetorical\nhabit; I hereby state that it is not\nillogical to think that the world is\ninfinite. Those who believe it to have\nlimits hypothesize that in some remote\nplace or places the corridors and\nstaircases and hexagons may,\ninconceivably, end—which is absurd.\nAnd yet those who picture the world as\nunlimited forget that the number of\npossible books is not. I will be bold\nenough to suggest this solution to the\nancient problem: The Library is", "unlimited but periodic. If an eternal\ntraveler should journey in any\ndirection, he would find after untold\ncenturies that the same volumes are\nrepeated in the same disorder—which,\nrepeated, becomes order: the Order. My\nsolitude is cheered by that elegant\nhope. [4]\n\nNOTES\n\n[1] The original manuscript has\nneither numbers nor capital letters;\npunctuation is limited to the comma\nand the period. Those two marks, the", "space, and the twenty-two letters of\nthe alphabet are the twenty-five\nsufficient symbols that our unknown\nauthor is referring to. [Ed. note.]\n\n[2] In earlier times, there was one\nman for every three hexagons. Suicide\nand diseases of the lung have played\nhavoc with that proportion. An\nunspeakably melancholy memory: I have\nsometimes traveled for nights on end,\ndown corridors and polished\nstaircases, without coming across a\nsingle librarian.\n", "[3] I repeat: In order for a book to\nexist, it is sufficient that it be\npossible. Only the impossible is\nexcluded. For example, no book is also\na staircase, though there are no doubt\nbooks that discuss and deny and prove\nthat possibility, and others whose\nstructure corresponds to that of a\nstaircase.\n\n[4] Letizia Alvarez de Toledo has\nobserved that the vast Library is\npointless; strictly speaking, all that\nis required is a single volume, of the\ncommon size, printed in nine- or", "ten-point type, that would consist of\nan infinite number of infinitely thin\npages. (In the early seventeenth\ncentury, Cavalieri stated that every\nsolid body is the superposition of an\ninfinite number of planes.) Using that\nsilken vademecum would not be easy:\neach apparent page would open into\nother similar pages; the inconceivable\nmiddle page would have no \"back.\"\n\n\n\n\n"];
+function babelCoverCanvas(){
+  const W=256,H=352;
+  return surface(W,H,g=>{
+    const gr=g.createLinearGradient(0,0,0,H);
+    gr.addColorStop(0,"rgb(64,36,28)");gr.addColorStop(.55,"rgb(46,25,21)");gr.addColorStop(1,"rgb(28,15,13)");
+    g.fillStyle=gr;g.fillRect(0,0,W,H);
+    for(let i=0;i<1300;i++){g.fillStyle=rnd()<.5?"rgba(255,230,190,.05)":"rgba(0,0,0,.10)";g.fillRect(rnd()*W,rnd()*H,1+rnd()*2,1)}
+    const fold=g.createLinearGradient(0,0,18,0);fold.addColorStop(0,"rgba(0,0,0,.4)");fold.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=fold;g.fillRect(0,0,18,H);
+    g.fillStyle="rgba(0,0,0,.3)";g.fillRect(W-5,0,5,H);g.fillRect(0,0,W,5);g.fillRect(0,H-5,W,5);
+    g.strokeStyle="rgba(216,180,110,.85)";g.lineWidth=2;g.strokeRect(16,16,W-32,H-32);
+    g.strokeStyle="rgba(216,180,110,.4)";g.lineWidth=1;g.strokeRect(22,22,W-44,H-44);
+    g.strokeStyle="rgba(216,180,110,.9)";g.lineWidth=2;g.beginPath();
+    for(let kk=0;kk<6;kk++){const an=kk/6*tau+Math.PI/6,px=W/2+30*Math.cos(an),py=92+30*Math.sin(an);kk?g.lineTo(px,py):g.moveTo(px,py)}
+    g.closePath();g.stroke();
+    g.strokeStyle="rgba(216,180,110,.5)";g.lineWidth=1;g.beginPath();
+    for(let kk=0;kk<6;kk++){const an=kk/6*tau+Math.PI/6,px=W/2+22*Math.cos(an),py=92+22*Math.sin(an);kk?g.lineTo(px,py):g.moveTo(px,py)}
+    g.closePath();g.stroke();
+    g.fillStyle="rgba(216,180,110,.9)";g.beginPath();g.arc(W/2,92,2.6,0,7);g.fill();
+    g.textAlign="center";g.textBaseline="middle";
+    g.fillStyle="#e2c37e";g.font='600 30px Georgia,"Times New Roman",serif';
+    g.fillText("THE LIBRARY",W/2,H/2+16);
+    g.fillText("OF BABEL",W/2,H/2+52);
+    g.fillStyle="rgba(226,195,126,.75)";g.font='11px Georgia,serif';
+    g.fillText("J O R G E  L U I S  B O R G E S",W/2,H/2+100);
+    g.fillStyle="rgba(216,180,110,.5)";g.font='11px Georgia,serif';
+    g.fillText("E N G L I S H   ·   M C M X L I",W/2,H-44);
+  });
+}
+function babelSpineCanvas(){
+  const W=96,H=512;
+  return surface(W,H,g=>{
+    const gr=g.createLinearGradient(0,0,0,H);
+    gr.addColorStop(0,"rgb(52,30,24)");gr.addColorStop(.5,"rgb(42,23,19)");gr.addColorStop(1,"rgb(26,14,12)");
+    g.fillStyle=gr;g.fillRect(0,0,W,H);
+    for(let i=0;i<500;i++){g.fillStyle=rnd()<.5?"rgba(255,230,190,.05)":"rgba(0,0,0,.1)";g.fillRect(rnd()*W,rnd()*H,1+rnd()*2,1)}
+    g.fillStyle="rgba(0,0,0,.35)";g.fillRect(0,0,6,H);g.fillRect(W-6,0,6,H);
+    g.fillStyle="rgba(216,180,110,.85)";g.fillRect(10,36,W-20,7);g.fillRect(10,H-44,W-20,7);
+    g.save();g.translate(W/2,H/2);g.rotate(Math.PI/2);g.textAlign="center";g.textBaseline="middle";
+    g.fillStyle="#dcb76e";g.font='600 26px Georgia,"Times New Roman",serif';
+    g.fillText("THE LIBRARY OF BABEL",0,-14);
+    g.fillStyle="rgba(220,183,110,.8)";g.font='13px Georgia,serif';
+    g.fillText("J. L. BORGES",0,22);
+    g.restore();
+    g.save();g.translate(W/2,72);g.rotate(Math.PI/4);g.fillStyle="rgba(216,180,110,.85)";g.fillRect(-5,-5,10,10);g.restore();
+    g.save();g.translate(W/2,H-72);g.rotate(Math.PI/4);g.fillStyle="rgba(216,180,110,.85)";g.fillRect(-5,-5,10,10);g.restore();
+  });
+}
+function addBabelBook(i,r,y,ang,sc){
+  const rg=makeRng(19410401);
+  const cc=babelCoverCanvas();
+  const faceMat=std({map:texture(cc),roughness:.6});
+  const backC=surface(96,128,g=>{g.fillStyle="rgb(33,18,15)";g.fillRect(0,0,96,128);g.strokeStyle="rgba(0,0,0,.3)";g.strokeRect(4,4,88,120)});
+  const backMat=std({map:texture(backC),roughness:.8});
+  const spineMat=std({map:texture(babelSpineCanvas()),roughness:.75});
+  const m=new T.Mesh(geo,[pagesMat,spineMat,pagesMat,pagesMat,faceMat,backMat]);
+  m.position.set(r*Math.sin(ang),y,r*Math.cos(ang));
+  const baseRot=ang+Math.PI+(rg()-.5)*1.2;
+  m.rotation.set((rg()-.5)*.5,baseRot,(rg()-.5)*.4);
+  m.scale.setScalar(sc);
+  m.castShadow=m.receiveShadow=true;
+  m.userData={title:BABEL_TITLE,seed:19410401,pages:BABEL_PAGES.length,baseCol:[52,30,24],coverCanvas:cc,
+    face:faceMat,back:backMat,base:m.position.clone(),babel:true,
+    fF:.22+rnd()*.2,fP:rnd()*tau,fA:.07+rnd()*.08,rF:.1+rnd()*.15,rP:rnd()*tau,sc,baseRot,
+    veiled:false,sent:false};
+  scene.add(m);books.push(m);
+}
+/* 固定之书亦随机出现：每次刷新落在不同的回廊深处 */
+addBabelBook(fi++,1.2+rnd()*3.4,-2.5+rnd()*6.6,rnd()*tau,.6+rnd()*.18);
+
+/* ---- 尘埃 ---- */
+const air=new T.Group();scene.add(air);
+const dot=texture(surface(32,32,g=>{const d=g.createRadialGradient(16,16,0,16,16,16);d.addColorStop(0,"#fff");d.addColorStop(.3,"#fffc");d.addColorStop(1,"#fff0");g.fillStyle=d;g.fillRect(0,0,32,32)}));
+const xyz=new Float32Array((mobile?380:700)*3);
+for(let i=0;i<xyz.length;i+=3)xyz.set([(rnd()-.5)*28,rnd()*12-4.4,(rnd()-.5)*28],i);
+const pg=new T.BufferGeometry();pg.setAttribute("position",new T.BufferAttribute(xyz,3));
+const dust=new T.Points(pg,new T.PointsMaterial({map:dot,color:new T.Color(1.4,1.05,.58),size:.06,transparent:true,opacity:.8,depthWrite:false,blending:T.AdditiveBlending}));air.add(dust);
+
+/* ---- 字母之尘：A–Z 各一粒，绝不重复 ----
+ * 字符图集（26 格横排）+ 自定义点着色器，按粒子索引采样各自字母；
+ * 每粒独立漂移轨道（角速度/半径/高度/相位各异） */
+const glyphU={px:200.0};
+let glyphPts=null,glyphPos=null,glyphMeta=[];
+{
+  const AC=64,atlasC=surface(AC*26,AC,g=>{
+    g.textAlign="center";g.textBaseline="middle";
+    for(let i=0;i<26;i++){
+      g.fillStyle="#fff";g.font='46px Georgia,serif';
+      g.fillText(LETTERS[i],i*AC+AC/2,AC/2+2);
+    }
+  });
+  const atlas=new T.CanvasTexture(atlasC);
+  atlas.colorSpace=T.SRGBColorSpace;atlas.flipY=false;
+  atlas.generateMipmaps=false;atlas.minFilter=T.LinearFilter;
+  const order=[...LETTERS];
+  for(let i=order.length-1;i>0;i--){const j=(rnd()*(i+1))|0;[order[i],order[j]]=[order[j],order[i]]}
+  const N=26;
+  glyphPos=new Float32Array(N*3);
+  const aL=new Float32Array(N);
+  for(let i=0;i<N;i++){
+    aL[i]=i;
+    const r=1.6+rnd()*11.5,an=rnd()*tau;
+    glyphPos[i*3]=r*Math.sin(an);
+    glyphPos[i*3+1]=rnd()*9.4-3.7;
+    glyphPos[i*3+2]=r*Math.cos(an);
+    glyphMeta.push({r,an,w:(.045+rnd()*.13)*(rnd()<.5?-1:1),y0:glyphPos[i*3+1],
+      f:.12+rnd()*.22,p:rnd()*tau,amp:.14+rnd()*.24});
+  }
+  const g2=new T.BufferGeometry();
+  g2.setAttribute("position",new T.BufferAttribute(glyphPos,3));
+  g2.setAttribute("aLetter",new T.BufferAttribute(aL,1));
+  const mat=new T.ShaderMaterial({
+    transparent:true,depthWrite:false,blending:T.AdditiveBlending,
+    uniforms:{map:{value:atlas},uPx:{value:glyphU.px},uCol:{value:new T.Color(1.22,1.02,.62)},uOp:{value:mobile?.38:.5}},
+    vertexShader:`attribute float aLetter;varying float vL;uniform float uPx;
+      void main(){vL=aLetter;vec4 mv=modelViewMatrix*vec4(position,1.);
+      gl_PointSize=clamp(uPx/-mv.z,4.0,90.0);gl_Position=projectionMatrix*mv;}`,
+    fragmentShader:`uniform sampler2D map;uniform vec3 uCol;uniform float uOp;varying float vL;
+      void main(){vec2 uv=vec2((vL+gl_PointCoord.x)/26.0,gl_PointCoord.y);
+      vec4 c=texture2D(map,uv);if(c.a<.03)discard;
+      gl_FragColor=vec4(c.rgb*uCol,c.a*uOp);}`
+  });
+  glyphPts=new T.Points(g2,mat);
+  glyphPts.frustumCulled=false;
+  air.add(glyphPts);
+}
+const noiseT=texture(surface(256,256,(g,w,h)=>{let im=g.createImageData(w,h);for(let i=0;i<w*h;i++){const v=rnd()*255;im.data.set([v,v,v,255],4*i)}g.putImageData(im,0,0)}));
+noiseT.wrapS=noiseT.wrapT=T.RepeatWrapping;noiseT.colorSpace=T.NoColorSpace;
+noiseT.generateMipmaps=false;noiseT.minFilter=T.LinearFilter;
+function mistLayer(off,scale,spd,boost){
+  return new T.ShaderMaterial({transparent:true,depthWrite:false,side:T.DoubleSide,
+    defines:{OCT:mobile?3:4},
+    uniforms:{noiseMap:{value:noiseT},clock:{value:0},off:{value:new T.Vector2(off[0],off[1])},uscale:{value:scale},spd:{value:spd},boost:{value:boost}},
+    vertexShader:`varying vec2 vUv;varying vec3 wp;
+      void main(){vUv=uv;vec4 w=modelMatrix*vec4(position,1.);wp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
+    fragmentShader:`
+      uniform sampler2D noiseMap;uniform float clock,uscale,spd,boost;uniform vec2 off;
+      varying vec2 vUv;varying vec3 wp;
+      float n(vec2 q){
+        vec2 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
+        float a=texture2D(noiseMap,(i+.5)/256.).r;
+        float b=texture2D(noiseMap,(i+vec2(1.,0.)+.5)/256.).r;
+        float c=texture2D(noiseMap,(i+vec2(0.,1.)+.5)/256.).r;
+        float d=texture2D(noiseMap,(i+vec2(1.,1.)+.5)/256.).r;
+        return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
+      }
+      float fbm(vec2 q){float s=0.,amp=.5;for(int k=0;k<OCT;k++){s+=amp*n(q);q=q*2.03+vec2(17.3,9.1);amp*=.5;}return s;}
+      void main(){
+        float t=clock*spd;
+        vec2 q=wp.xz*uscale+off;
+        float w1=fbm(q*.5+vec2(t*.045,-t*.02));
+        vec2 flow=vec2(t*.05,t*.022)+vec2(w1,-w1)*.9;
+        float f=fbm(q*.42+flow);
+        float ptch=fbm(q*.11-vec2(t*.02,t*.01));
+        float body=smoothstep(.48,.86,f*.58+ptch*.42);
+        float rad=length(wp.xz);
+        float ring=smoothstep(1.1,3.0,rad)*(1.-smoothstep(8.5,15.5,rad));
+        float edge=1.-smoothstep(.30,.48,max(abs(vUv.x-.5),abs(vUv.y-.5)));
+        float far=1.-smoothstep(9.,20.,distance(wp,cameraPosition));
+        float alpha=body*ring*edge*far*boost;
+        vec3 col=mix(vec3(.35,.40,.39),vec3(.57,.62,.59),body);
+        gl_FragColor=vec4(col,alpha);
+      }`});
+}
+const mists=[mistLayer([0,0],1,1,mobile?.26:.2)];
+if(!mobile)mists.push(mistLayer([37.2,17.9],.78,.7,.13));
+mists.forEach((mm,i)=>{const mesh=new T.Mesh(new T.PlaneGeometry(46,46),mm);mesh.rotation.x=-Math.PI/2;mesh.position.y=-3.6-i*.35;air.add(mesh)});
+
+/* ---- 交互：取卷 → 飞向镜头 ---- */
+const ray=new T.Raycaster(),uv=new T.Vector2(),tmp=V();let mouse=false,down=null,held=new Set(),time=0,last=performance.now(),px=0,py=0;
+const fadeEl=document.getElementById("fade"),tipEl=document.getElementById("tip");
+function point(e){const b=canvas.getBoundingClientRect();uv.set(2*(e.clientX-b.left)/b.width-1,1-2*(e.clientY-b.top)/b.height)}
+function pick(){ray.setFromCamera(uv,cam);return ray.intersectObjects(books,false)[0]?.object}
+let flight=null,flightTime=0,openTimer=0;
+function open(m){
+  if(flight||!m)return;
+  flight=m;flightTime=0;ctl.enabled=false;ctl.autoRotate=false;
+  m.userData.veiled=false;m.userData.sent=false;
+  m.userData.start=m.position.clone();
+  m.userData.end=cam.getWorldDirection(V()).multiplyScalar(1.5).add(cam.position);
+  clearTimeout(openTimer);
+  openTimer=setTimeout(()=>{
+    if(flight===m&&!curBook){try{openReader(m)}catch(err){console.error(err);reportError((window.__lang==="en"?"Error opening volume: ":"取卷异常：")+((err&&err.message)||""))}}
+  },1500);
+}
+canvas.onpointerdown=e=>{held.add(e.pointerId);point(e);mouse=false;down=held.size===1&&e.button===0?{id:e.pointerId,x:e.clientX,y:e.clientY,m:pick()}:null};
+canvas.onpointermove=e=>{point(e);px=e.clientX;py=e.clientY;mouse=!held.size&&e.pointerType==="mouse";if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)down=null};
+canvas.onpointerup=e=>{held.delete(e.pointerId);point(e);if(down?.id===e.pointerId&&pick()===down.m&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<=6)open(down.m);down=null};
+canvas.onpointercancel=e=>{held.delete(e.pointerId);down=null};canvas.onpointerleave=()=>mouse=false;
+
+/* ================= 阅读器 ================= */
+const reader=document.getElementById("reader"),bookEl=document.getElementById("book"),
+      halfL=document.getElementById("halfL"),halfR=document.getElementById("halfR"),
+      faceL=document.getElementById("faceL"),faceR=document.getElementById("faceR"),
+      gutterEl=document.getElementById("gutterEl"),edgeL=document.getElementById("edgeL"),edgeR=document.getElementById("edgeR"),
+      lshadowEl=document.getElementById("lshadow"),
+      leaf=document.getElementById("leaf"),leafF=document.getElementById("leafF"),leafB=document.getElementById("leafB");
+let curBook=null,s=0,busy=false,drag=null;
+const uc=bd=>bd.cache||(bd.cache={});
+function pageTextStr(bd,no){
+  const c=uc(bd),key="t"+no;if(key in c)return c[key];
+  if(bd.userData.babel)return c[key]=BABEL_PAGES[no-1]||"";
+  const rg=makeRng(((bd.userData.seed*7349+no*104729)>>>0)||1);
+  let out="";
+  for(let i=0;i<16;i++){
+    let s="";
+    for(let gp=0;gp<10;gp++){
+      for(let kk=0;kk<5;kk++){const q=rg();s+=q<.93?LETTERS[(rg()*26)|0]:q<.965?",":"."}
+      s+=" ";
+    }
+    out+=s+"\n";
+  }
+  c[key]=out;return out;
+}
+function bookMeta(bd){
+  const c=uc(bd);if(c.meta)return c.meta;
+  const rg=makeRng((bd.userData.seed*911+17)>>>0);
+  c.meta={hx:1+((rg()*23)|0),hy:1+((rg()*32)|0),face:1+((rg()*6)|0),shelf:1+((rg()*7)|0),copy:1+((rg()*37)|0)};
+  return c.meta;
+}
+function metaLine(m){
+  return window.__lang==="en"
+    ?`Hexagon ${m.hx}–${m.hy} · Wall ${m.face} · Shelf ${m.shelf} · Copy ${m.copy}`
+    :`六角室 ${m.hx}–${m.hy} · 第 ${m.face} 面 · 第 ${m.shelf} 格 · 第 ${m.copy} 册`;
+}
+const HEXSVG='<svg class="hexs" viewBox="0 0 40 40"><polygon points="33.9,12 33.9,28 20,36 6.1,28 6.1,12 20,4" fill="none" stroke="#8f7a52" stroke-width="1.4"/><polygon points="28.7,15 28.7,25 20,30 11.3,25 11.3,15 20,10" fill="none" stroke="#a08a5e" stroke-width="1"/><circle cx="20" cy="20" r="1.6" fill="#6b5638"/></svg>';
+function textPage(bd,no){
+  const d=document.createElement("div");d.className="pg";
+  const t2=document.createElement("div");t2.className="pt";t2.textContent=pageTextStr(bd,no);
+  const n=document.createElement("div");n.className="pn";n.textContent="— "+no+" —";
+  d.appendChild(t2);d.appendChild(n);return d;
+}
+function titleNode(bd){
+  const d=document.createElement("div");d.className="pg tp";
+  if(bd.userData.babel){d.innerHTML=HEXSVG+`<div class="ttl">«The Library<br>of Babel»</div><div class="rule"></div><div class="sub">JORGE LUIS BORGES</div><div class="idx">The universe (which others call the Library)…</div>`;return d}
+  d.innerHTML=HEXSVG+`<div class="ttl">«${bd.userData.title}»</div><div class="rule"></div><div class="sub">B I B L I O T H E C A</div><div class="idx">${metaLine(bookMeta(bd))}</div>`;
+  return d;
+}
+function coloNode(bd){
+  const P=bd.userData.pages,d=document.createElement("div");d.className="pg colo";
+  if(bd.userData.babel){d.innerHTML=HEXSVG+`<div class="rule"></div><div class="big">${window.__lang==="en"?`THIS VOLUME · ${P} PAGES`:`此 册 凡 ${P} 頁`}</div><div class="idx">Jorge Luis Borges, “The Library of Babel”<br>English version · J. E. Irby</div>`;return d}
+  const m=bookMeta(bd);
+  const big=window.__lang==="en"?`THIS VOLUME · ${P} PAGES`:`此 册 凡 ${P} 頁`;
+  const idx=window.__lang==="en"
+    ?`Hexagon ${m.hx}–${m.hy} · Wall ${m.face} · Shelf ${m.shelf}<br>Its letters are only chance; to read meaning in them is coincidence.`
+    :`六角室 ${m.hx}–${m.hy} · 第 ${m.face} 面 · 第 ${m.shelf} 格<br>其文皆字母之偶然，讀出意義者屬巧合`;
+  d.innerHTML=HEXSVG+`<div class="rule"></div><div class="big">${big}</div><div class="idx">${idx}</div>`;
+  return d;
+}
+function coverNode(bd){
+  const cv=document.createElement("canvas");cv.className="cvr";cv.width=300;cv.height=470;
+  try{
+    const g=cv.getContext("2d"),sc=470/352,sw=300/sc,sx=(256-sw)/2;
+    g.fillStyle="#10130f";g.fillRect(0,0,300,470);
+    g.drawImage(bd.userData.coverCanvas,sx,0,sw,352,0,0,300,470);
+  }catch(_){}
+  return cv;
+}
+function backNode(bd){
+  const cv=document.createElement("canvas");cv.className="cvr";cv.width=300;cv.height=470;
+  try{
+    const g=cv.getContext("2d"),b=bd.userData.baseCol;
+    g.fillStyle=`rgb(${(b[0]*.72)|0},${(b[1]*.72)|0},${(b[2]*.72)|0})`;g.fillRect(0,0,300,470);
+    for(let i=0;i<300;i++){g.fillStyle=rnd()<.5?"rgba(255,240,210,.05)":"rgba(0,0,0,.1)";g.fillRect(rnd()*300,rnd()*470,1+rnd()*2,1)}
+    g.fillStyle="rgba(0,0,0,.3)";g.fillRect(0,0,300,8);g.fillRect(0,462,300,8);
+    g.strokeStyle="rgba(216,180,110,.55)";g.lineWidth=2;g.strokeRect(12,12,276,446);
+    g.strokeStyle="rgba(216,180,110,.3)";g.lineWidth=1;g.strokeRect(18,18,264,434);
+    g.strokeStyle="rgba(216,180,110,.8)";g.lineWidth=2;g.beginPath();
+    for(let kk=0;kk<6;kk++){const an=kk/6*tau+Math.PI/6,px=150+40*Math.cos(an),py=210+40*Math.sin(an);kk?g.lineTo(px,py):g.moveTo(px,py)}
+    g.closePath();g.stroke();
+    g.fillStyle="rgba(216,180,110,.8)";g.beginPath();g.arc(150,210,4,0,7);g.fill();
+    g.fillStyle="rgba(216,180,110,.7)";g.font='13px Georgia,serif';g.textAlign="center";g.textBaseline="middle";
+    g.fillText("F  I  N  I  S",150,385);
+  }catch(_){}
+  return cv;
+}
+function slot(bd,idx,sideF){
+  const P=bd.userData.pages,L=P/2;
+  if(idx<=0)return sideF?coverNode(bd):titleNode(bd);
+  if(idx>=L+1)return sideF?coloNode(bd):backNode(bd);
+  return textPage(bd,idx*2-1+(sideF?0:1));
+}
+function mount(face,node){face.innerHTML="";face.appendChild(node)}
+const MAXLIFT=24;
+function setLeafAng(deg){
+  const rad=Math.abs(deg)*Math.PI/180,ln=Math.sin(rad);
+  leaf.style.transform=`translateZ(${(MAXLIFT*ln).toFixed(1)}px) rotateY(${deg.toFixed(2)}deg) scaleX(${(1-.07*ln).toFixed(3)})`;
+  const br=1-.34*ln;
+  const f=`brightness(${br.toFixed(3)})`;
+  leafF.style.filter=f;leafB.style.filter=f;
+  const sh=`0 ${(4+26*ln).toFixed(1)}px ${(16+34*ln).toFixed(1)}px rgba(0,0,0,${(.14+.34*ln).toFixed(3)})`;
+  leafF.style.boxShadow=sh;leafB.style.boxShadow=sh;
+  lshadowEl.style.opacity=(.58*ln).toFixed(3);
+  lshadowEl.style.transform=`translateX(${(92*Math.cos(rad)).toFixed(1)}px)`;
+}
+function clearLeafFx(){
+  leaf.style.transform="";leafF.style.filter=leafB.style.filter="";
+  leafF.style.boxShadow=leafB.style.boxShadow="";lshadowEl.style.opacity=0;lshadowEl.style.transform="";
+}
+let shiftRaf=0,shiftNow=0,shiftInit=false,pscaleV=1;
+function applyBookT(){bookEl.style.transform="translate("+(shiftNow*pscaleV).toFixed(1)+"px,0px) scale("+pscaleV.toFixed(4)+")"}
+function fitReader(){
+  const rc=reader.getBoundingClientRect();
+  const vv=window.visualViewport;
+  const vw=Math.max(rc.width||0,vv?vv.width:0)||innerWidth;
+  const vh=Math.max(rc.height||0,vv?vv.height:0)||innerHeight;
+  pscaleV=Math.max(.34,Math.min(1,(vw-16)/612,(vh-26)/480));
+  applyBookT();
+}
+bookEl.style.width="604px";bookEl.style.height="470px";applyBookT();
+function animShift(target){
+  if(shiftRaf){cancelAnimationFrame(shiftRaf);shiftRaf=0}
+  if(!shiftInit){shiftInit=true;shiftNow=target;applyBookT();return}
+  const from=shiftNow,d=target-from;
+  if(Math.abs(d)<.5||quiet){shiftNow=target;applyBookT();return}
+  const t0=performance.now(),dur=Math.min(620,220+Math.abs(d)*1.3);
+  const step=t2=>{
+    const p=Math.min(1,(t2-t0)/dur),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    shiftNow=from+d*e;applyBookT();
+    shiftRaf=p<1?requestAnimationFrame(step):0;
+  };
+  shiftRaf=requestAnimationFrame(step);
+}
+function syncStatic(){
+  if(!curBook)return;
+  const bd=curBook,P=bd.userData.pages,L=P/2;
+  const hasL=s>0,hasR=s<=L+1;
+  halfL.style.display=hasL?"block":"none";
+  halfR.style.display=hasR?"block":"none";
+  gutterEl.style.display=(hasL&&hasR)?"block":"none";
+  edgeL.style.display=hasL?"block":"none";
+  edgeR.style.display=hasR?"block":"none";
+  mount(faceL,hasL?slot(bd,s-1,false):document.createElement("div"));
+  mount(faceR,hasR?slot(bd,s,true):document.createElement("div"));
+  animShift(s===0?-150:(s===L+2?150:0));
+  leaf.style.display="none";clearLeafFx();
+}
+function animateLeaf(fromDeg,toDeg,dur,done){
+  busy=true;
+  leaf.style.transition="none";leaf.style.display="block";
+  const t0=performance.now();
+  (function fr(t2){
+    const p=Math.min(1,(t2-t0)/dur);
+    const e=p<.5?(.5-.5*Math.cos(Math.PI*p*2))*.58:.58+.42*Math.pow((p-.5)*2,2.2);
+    setLeafAng(fromDeg+(toDeg-fromDeg)*e);
+    if(p<1)requestAnimationFrame(fr);
+    else{leaf.style.display="none";clearLeafFx();busy=false;done()}
+  })(t0);
+}
+function premount(dir){
+  const bd=curBook,P=bd.userData.pages,L=P/2;
+  if(dir==="f"){
+    mount(leafF,slot(bd,s,true));mount(leafB,slot(bd,s,false));
+    if(s+1<=L+1){mount(faceR,slot(bd,s+1,true))}
+    else{faceR.innerHTML="";halfR.style.display="none";gutterEl.style.display="none";edgeR.style.display="none"}
+  }else{
+    mount(leafF,slot(bd,s-1,true));mount(leafB,slot(bd,s-1,false));
+    if(s-2>=0){mount(faceL,slot(bd,s-2,false))}
+    else{faceL.innerHTML="";halfL.style.display="none";gutterEl.style.display="none";edgeL.style.display="none"}
+  }
+}
+function forward(){
+  if(busy||!curBook||reader.hidden)return;
+  const bd=curBook,L=bd.userData.pages/2;
+  if(s>L+1)return;
+  premount("f");
+  animateLeaf(0,-180,540,()=>{s++;syncStatic()});
+}
+function backward(){
+  if(busy||!curBook||reader.hidden)return;
+  const bd=curBook;
+  if(s<=0)return;
+  premount("b");
+  animateLeaf(-180,0,540,()=>{s--;syncStatic()});
+}
+function openReader(m){
+  curBook=m;busy=false;s=0;drag=null;mouse=false;shiftInit=false;if(flight)flight.visible=false;
+  clearTimeout(openTimer);
+  fitReader();syncStatic();setTimeout(fitReader,400);setTimeout(fitReader,1500);
+  reader.hidden=false;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    reader.classList.add("on");
+    setTimeout(()=>{fadeEl.style.opacity=0},320);
+  }));
+  try{localStorage.setItem("babel_pages",String(+(localStorage.getItem("babel_pages")||0)+1))}catch(_){}
+}
+function closeReader(){
+  busy=false;clearTimeout(openTimer);drag=null;
+  reader.classList.remove("on");setTimeout(()=>{reader.hidden=true},300);
+  curBook=null;fadeEl.style.opacity=0;
+  if(flight){flight.visible=true;flight.position.copy(flight.userData.base);flight.scale.setScalar(flight.userData.sc);flight.userData.veiled=false;flight.userData.sent=false;flight=null}
+  ctl.enabled=true;
+}
+bookEl.addEventListener("pointerdown",e=>{
+  if(busy||!curBook||reader.hidden||drag)return;
+  const b=bookEl.getBoundingClientRect();
+  drag={dir:e.clientX-b.left>=b.width/2?"f":"b",sx:e.clientX,sy:e.clientY,active:false,p:0,lastX:e.clientX,lastT:performance.now(),v:0};
+  try{bookEl.setPointerCapture(e.pointerId)}catch(_){}
+});
+bookEl.addEventListener("pointermove",e=>{
+  if(!drag||busy||!curBook)return;
+  const b=bookEl.getBoundingClientRect();
+  const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
+  if(!drag.active){
+    if(Math.hypot(dx,dy)<9)return;
+    if(drag.dir==="f"&&dx>=0)return;
+    if(drag.dir==="b"&&dx<=0)return;
+    if(drag.dir==="f"&&s>curBook.userData.pages/2+1)return;
+    if(drag.dir==="b"&&s<=0)return;
+    drag.active=true;
+    premount(drag.dir);
+    leaf.style.transition="none";leaf.style.display="block";
+  }
+  const hw=b.width*.42;
+  const p=drag.dir==="f"
+    ?Math.max(0,Math.min(1,(drag.sx-e.clientX)/hw))
+    :Math.max(0,Math.min(1,(e.clientX-drag.sx)/hw));
+  drag.p=p;
+  const now=performance.now();
+  drag.v=(e.clientX-drag.lastX)/Math.max(1,now-drag.lastT);
+  drag.lastX=e.clientX;drag.lastT=now;
+  setLeafAng(drag.dir==="f"?-180*p:-180+180*p);
+});
+function endDrag(){
+  if(!drag)return;
+  const d=drag;drag=null;
+  if(!d.active){
+    (d.dir==="f"?forward:backward)();return;
+  }
+  const flick=d.dir==="f"?d.v<-.55:d.v>.55;
+  const cur=d.dir==="f"?-180*d.p:-180+180*d.p;
+  const commit=d.p>.42||flick;
+  if(d.dir==="f"){
+    if(commit&&s<=curBook.userData.pages/2+1)animateLeaf(cur,-180,Math.max(150,440*(1-d.p)),()=>{s++;syncStatic()});
+    else animateLeaf(cur,0,Math.max(150,340*d.p),()=>syncStatic());
+  }else{
+    if(commit&&s>=1)animateLeaf(cur,0,Math.max(150,440*(1-d.p)),()=>{s--;syncStatic()});
+    else animateLeaf(cur,-180,Math.max(150,340*(1-d.p)),()=>syncStatic());
+  }
+}
+bookEl.addEventListener("pointerup",endDrag);
+bookEl.addEventListener("pointercancel",endDrag);
+reader.addEventListener("click",e=>{if(e.target===reader)closeReader()});
+addEventListener("keydown",e=>{
+  if(reader.hidden||!curBook)return;
+  if(e.key==="Escape")closeReader();
+  else if(e.key==="ArrowRight")forward();
+  else if(e.key==="ArrowLeft")backward();
+});
+addEventListener("resize",fitReader);
+addEventListener("orientationchange",()=>setTimeout(fitReader,150));
+if(window.visualViewport)visualViewport.addEventListener("resize",fitReader);
+window.__onLang=()=>{if(curBook&&!reader.hidden)syncStatic()};
+
+function size(){const w=canvas.clientWidth,h=canvas.clientHeight,p=Math.min(devicePixelRatio,mobile?1.75:2.25,Math.sqrt((mobile?2400000:3200000)/(w*h)));r.setPixelRatio(p);r.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<h?65:57;cam.updateProjectionMatrix();glyphU.px=h*p*.32;if(post){post.setPixelRatio(p);post.setSize(w,h);aa.uniforms.resolution.value.set(1/post.readBuffer.width,1/post.readBuffer.height);dof.uniforms.aspect.value=w/h}}size();addEventListener("resize",size);
+function frame(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;time+=dt*(quiet?.2:1);if(!flight)ctl.update();cam.updateMatrixWorld();
+for(const m of books){if(m===flight)continue;const d=m.userData,s0=time*d.fF+d.fP;
+  m.position.copy(d.base);m.position.y+=d.fA*Math.sin(s0);
+  const rr=Math.sin(time*d.rF+d.rP)*.15;
+  m.rotation.set(.09*Math.sin(s0*.8),d.baseRot+rr*.5,.07*Math.cos(s0*.7));
+  m.updateMatrixWorld()}
+if(flight){
+  flightTime+=dt;
+  const f=Math.min(1,flightTime/.6),e=f*f*(3-2*f);
+  flight.position.lerpVectors(flight.userData.start,flight.userData.end,e);
+  flight.scale.setScalar(flight.userData.sc*(1+.15*e));
+  flight.lookAt(cam.position);
+  flight.updateMatrixWorld();
+  if(flightTime>=.34&&!flight.userData.veiled){flight.userData.veiled=true;fadeEl.style.opacity=1}
+  if(flightTime>=.52&&!flight.userData.sent){
+    flight.userData.sent=true;
+    try{openReader(flight)}
+    catch(err){
+      console.error("open failed",err);reportError((window.__lang==="en"?"Error opening volume: ":"取卷异常：")+((err&&err.message)||""));
+      fadeEl.style.opacity=0;
+      flight.position.copy(flight.userData.base);flight.scale.setScalar(flight.userData.sc);
+      flight=null;ctl.enabled=true;
+    }
+  }
+}
+const hot=(mouse&&!flight)?pick():null,kk=1-Math.exp(-dt*10);
+for(const m of books){if(m===flight)continue;
+ let lampF=0;
+ for(const l of lamps){const dy=m.position.y-l.bulb.y;if(dy<-.15&&dy>-6.5){const dh=Math.hypot(m.position.x-l.bulb.x,m.position.z-l.bulb.z);if(dh<1.6){const f=(1-dh/1.6)*(1+dy/6.5);if(f>lampF)lampF=f}}}
+ let t2=m===hot?EMI_HOT:EMI_BASE;
+ t2=Math.max(t2,lampF*.45);
+ m.userData.face.emissiveIntensity+=(t2-m.userData.face.emissiveIntensity)*kk;
+ m.userData.back.emissiveIntensity+=((t2*.75)-m.userData.back.emissiveIntensity)*kk;
+ m.scale.setScalar(T.MathUtils.lerp(m.scale.x,m===hot?m.userData.sc*1.1:m.userData.sc,kk))}
+if(hot&&!flight){tipEl.textContent=`«${hot.userData.title}» · ${t("take")}`;const tw=tipEl.offsetWidth||120;tipEl.style.left=Math.max(8,Math.min(innerWidth-tw-16,px+16))+"px";tipEl.style.top=Math.max(8,Math.min(innerHeight-44,py+18))+"px";tipEl.style.opacity=1}else tipEl.style.opacity=0;
+canvas.style.cursor=flight?"default":held.size?"grabbing":hot?"pointer":"grab";
+dust.rotation.y=time*.012;dust.position.y=.19*Math.sin(time*.27);
+if(glyphPts){const gp=glyphPts.geometry.attributes.position;
+ for(let i=0;i<26;i++){const q=glyphMeta[i];
+  gp.array[i*3]=q.r*Math.sin(q.an+time*q.w);
+  gp.array[i*3+1]=q.y0+q.amp*Math.sin(time*q.f+q.p);
+  gp.array[i*3+2]=q.r*Math.cos(q.an+time*q.w);}
+ gp.needsUpdate=true}
+for(const l of lamps){l.g.rotation.z=Math.sin(time*.5+l.ph)*.02;l.g.rotation.x=Math.cos(time*.42+l.ph)*.02;l.pl.intensity=l.base*(1+.04*Math.sin(time*2.7+l.ph))}
+for(const mm of mists)mm.uniforms.clock.value=time;
+if(post){let focus=hot||flight;if(!focus){let best=Infinity;for(const m of books){tmp.copy(m.position).project(cam);const d=(tmp.x*cam.aspect)**2+tmp.y**2;if(tmp.z<1&&tmp.z>-1&&d<best){focus=m;best=d}}}if(focus)dof.uniforms.focus.value=T.MathUtils.lerp(dof.uniforms.focus.value,-tmp.copy(focus.position).applyMatrix4(cam.matrixWorldInverse).z,kk);post.render(dt)}else r.render(scene,cam)}
+frame(last);r.setAnimationLoop(frame);clearTimeout(watchdog);msg.hidden=true;
+document.addEventListener("visibilitychange",()=>{last=performance.now();r.setAnimationLoop(document.hidden?null:frame)});
+addEventListener("pageshow",()=>{held.clear();down=null;last=performance.now();
+ if(!reader.hidden)closeReader();
+ else if(flight){clearTimeout(openTimer);flight.visible=true;flight.position.copy(flight.userData.base);flight.scale.setScalar(flight.userData.sc);flight.userData.veiled=false;flight.userData.sent=false;flight=null;ctl.enabled=true;fadeEl.style.opacity=0}});
+canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();r.setAnimationLoop(null);fail(t("ctx"))});
+canvas.addEventListener("webglcontextrestored",()=>location.reload());
+if(!mobile&&r.extensions.has("EXT_color_buffer_float"))try{const modules=await Promise.all(["postprocessing/EffectComposer","postprocessing/RenderPass","postprocessing/BokehPass","postprocessing/UnrealBloomPass","postprocessing/ShaderPass","shaders/FXAAShader","postprocessing/OutputPass"].map(s2=>import("three/addons/"+s2+".js")));const [C,P,B,L,S,F,O]=modules,composer=new C.EffectComposer(r,new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:4}));dof=new B.BokehPass(scene,cam,{focus:6.5,aperture:.00024,maxblur:.0018});const draw=dof.render.bind(dof);dof.render=(...args)=>{air.visible=false;try{draw(...args)}finally{air.visible=true}};aa=new S.ShaderPass(F.FXAAShader);for(const p of [new P.RenderPass(scene,cam),dof,new L.UnrealBloomPass(new T.Vector2(1,1),.3,.3,.9),aa,new O.OutputPass()])composer.addPass(p);post=composer;size()}catch{post=null}
+}
+</script>
+</body>
+</html>
