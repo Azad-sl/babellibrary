@@ -133,13 +133,13 @@ zh:{title:"巴别图书馆",hex:"六 角 回 廊",h1:"巴 别 图 书 馆",foote
  wd:"图书馆久未开启 · 请检查网络后刷新重试",fail3d:"未能开启三维场景",ctx:"图形设备已暂停，请刷新。",take:"取卷",blog:"博客",
  abTitle:"巴 别 馆 志",epi:"『宇宙（别人管它叫图书馆）。』",epiBy:"—— 博尔赫斯《巴别图书馆》",
  ab1:"本站致敬博尔赫斯《巴别图书馆》：六角回廊环环相嵌，书架与半空的浮动书，皆由二十几个字母与逗、句、空格随机拼合而成。书脊上那些题名并非书名，只是字母的偶然；绝大多数书是无可解读的天书。你现在看到的每一册，都刚刚被随意地“写”了出来。",
- ab2:"任何浮书，皆可翻阅；点击书架可自架上取出一册新书：馆中藏书无限，取之不竭；浮书渐多时，早先取出的书会悄然归架。若某页忽然读出了意义，请理解为巧合：在一座收藏一切可能的图书馆里，荒诞与真理同属馆藏，谬误与奇迹皆为序章。",
+ ab2:"点击书架可自架上取出一册新书：馆中藏书无限，取之不竭；浮书渐多时，早先取出的书会悄然归架。任何浮书，皆可翻阅。传闻翻阅渐深时，一册布面的《沙之书》会悄然混入馆藏——合上它，它便混回书海，一生只此一遇。若某页忽然读出了意义，请理解为巧合：在一座收藏一切可能的图书馆里，荒诞与真理同属馆藏，谬误与奇迹皆为序章。",
  keeper:"图书馆管理员 · ",close:"合 卷",readN:"至此，您已在此馆翻阅过 {n} 页。"},
 en:{title:"The Library of Babel",hex:"THE HEXAGONAL GALLERIES",h1:"The Library of Babel",footer:"Drag to look around · Scroll to approach · Click to take a volume · Tap a shelf to summon",about:"About",opening:"Entering the Library…",
  wd:"The Library is slow to open · check your connection and refresh",fail3d:"Could not start the 3-D scene",ctx:"The graphics device was paused — please refresh.",take:"take",blog:"Blog",
  abTitle:"About this Library",epi:"“The universe (which others call the Library)…”",epiBy:"— Jorge Luis Borges, “The Library of Babel”",
  ab1:"This Library is a homage to Borges' “The Library of Babel”: hexagonal galleries nested without end. The books on the shelves and floating in mid-air are composed at random from two dozen letters, commas, periods, and spaces. The marks on the spines are not titles, only accidents of letters; most volumes are indecipherable gibberish. Every book you see has just been casually “written” into existence, right now.",
- ab2:"Any floating volume may be opened and read. Tap a bookshelf to draw a new book from its shelves: the collection is inexhaustible, and when the air grows crowded, earlier picks quietly return to their shelves. If a page suddenly makes sense, take it as coincidence: in a Library that holds all possibilities, absurdity and truth belong alike to the collection. Error and miracle are both prologues.",
+ ab2:"Tap a bookshelf to draw a new book from its shelves: the collection is inexhaustible, and when the air grows crowded, earlier picks quietly return to their shelves. Any floating volume may be opened and read. Legend has it that once you have read deeply enough, a cloth-bound Book of Sand will slip quietly into the collection — close it, and it melts back into the shelves, never to be found twice. If a page suddenly makes sense, take it as coincidence: in a Library that holds all possibilities, absurdity and truth belong alike to the collection. Error and miracle are both prologues.",
  keeper:"Librarian · ",close:"CLOSE",readN:"So far you have turned {n} pages in this Library."}};
 const EMBLEM='<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><polygon points="35.6,11 35.6,29 20,38 4.4,29 4.4,11 20,2" fill="none" stroke="#bd9a5e" stroke-width="1.8"/><polygon points="30.2,14.1 30.2,25.9 20,31.7 9.8,25.9 9.8,14.1 20,8.3" fill="none" stroke="#8f7a52" stroke-width="1"/><circle cx="20" cy="11.9" r="1.1" fill="#d8b16e"/><rect x="13.5" y="18.1" width="2" height="7.7" rx="1" fill="#c9a163"/><rect x="16.3" y="16.4" width="2" height="9.4" rx="1" fill="#c9a163"/><rect x="19.2" y="18.8" width="2" height="7" rx="1" fill="#c9a163"/><rect x="22" y="15.6" width="2" height="10.2" rx="1" fill="#c9a163"/><rect x="24.8" y="17.7" width="2" height="8.1" rx="1" fill="#c9a163"/></svg>';
 function t(k){const L=window.__lang||"zh";return (I18N[L]&&I18N[L][k])||I18N.zh[k]||k}
@@ -153,9 +153,7 @@ const QUOTES=[
  {zh:{t:"我敢断言，图书馆是无限的、周而复始的：一位永恒的旅人朝任何方向走去，纵使经过几个世纪，也会发现同样的书册以同样的无序重复着。",a:"终章"},
   en:{t:"I dare assert that the Library is infinite and cyclical: an eternal traveler in any direction will find, after centuries, the same volumes repeated in the same disorder.",a:"Finale"}},
  {zh:{t:"如果人类的物种灭绝了，图书馆依然存在：明亮、孤独、无限、完全静止、武装着珍贵的书籍、无用、不可腐蚀、且神秘。",a:"结语"},
-  en:{t:"If the species of man became extinct, the Library would endure: illuminated, solitary, infinite, perfectly motionless, equipped with precious volumes, useless, incorruptible, secret.",a:"End"}},
- {zh:{t:"如果空间是无限的，我们就处在空间的任何一点；如果时间是无限的，我们就处在时间的任何一点。",a:"《沙之书》"},
-  en:{t:"If space is infinite, we are at any point of space. If time is infinite, we are at any point of time.",a:"The Book of Sand"}}
+  en:{t:"If the species of man became extinct, the Library would endure: illuminated, solitary, infinite, perfectly motionless, equipped with precious volumes, useless, incorruptible, secret.",a:"End"}}
 ];
 function buildAbout(){
   const ab=document.getElementById("about");if(!ab)return;
@@ -684,30 +682,60 @@ addBabelBook(fi++,1.2+rnd()*3.4,-2.5+rnd()*6.6,rnd()*tau,.6+rnd()*.18);
 function sandCoverCanvas(){
   const W=256,H=352;
   return surface(W,H,g=>{
-    g.fillStyle="rgb(197,177,140)";g.fillRect(0,0,W,H);
-    for(let yy=0;yy<H;yy+=3){g.fillStyle=yy%6?"rgba(0,0,0,.045)":"rgba(255,250,235,.05)";g.fillRect(0,yy,W,1)}
-    for(let i=0;i<900;i++){g.fillStyle=rnd()<.5?"rgba(255,245,220,.06)":"rgba(92,72,42,.07)";g.fillRect(rnd()*W,rnd()*H,1+rnd()*2,1)}
-    const fold=g.createLinearGradient(0,0,14,0);fold.addColorStop(0,"rgba(0,0,0,.25)");fold.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=fold;g.fillRect(0,0,14,H);
-    g.fillStyle="rgba(0,0,0,.22)";g.fillRect(W-4,0,4,H);g.fillRect(0,0,W,4);g.fillRect(0,H-4,W,4);
+    const gr=g.createLinearGradient(0,0,W*.4,H);
+    gr.addColorStop(0,"rgb(211,190,152)");
+    gr.addColorStop(.55,"rgb(191,168,130)");
+    gr.addColorStop(1,"rgb(146,123,90)");
+    g.fillStyle=gr;g.fillRect(0,0,W,H);
+    for(let yy=0;yy<H;yy+=2){g.fillStyle=yy%4?"rgba(0,0,0,.032)":"rgba(255,248,230,.038)";g.fillRect(0,yy,W,1)}
+    for(let xx=0;xx<W;xx+=2){g.fillStyle=xx%4?"rgba(0,0,0,.02)":"rgba(255,248,230,.028)";g.fillRect(xx,0,1,H)}
+    for(let i=0;i<3400;i++){
+      const yy=Math.random()*H;
+      if(Math.random()>(yy/H)*1.15+.06)continue;
+      g.fillStyle=Math.random()<.5?"rgba(255,243,214,.12)":"rgba(84,62,34,.11)";
+      g.fillRect(Math.random()*W,yy,1,1);
+    }
+    for(const _c of [[10,10],[W-10,10],[10,H-10],[W-10,H-10]]){
+      const wr=g.createRadialGradient(_c[0],_c[1],2,_c[0],_c[1],34);
+      wr.addColorStop(0,"rgba(60,44,24,.28)");wr.addColorStop(1,"rgba(60,44,24,0)");
+      g.fillStyle=wr;g.fillRect(_c[0]-34,_c[1]-34,68,68);
+    }
+    const fold=g.createLinearGradient(0,0,14,0);fold.addColorStop(0,"rgba(0,0,0,.3)");fold.addColorStop(1,"rgba(0,0,0,0)");
+    g.fillStyle=fold;g.fillRect(0,0,14,H);
+    g.strokeStyle="rgba(122,96,50,.4)";g.lineWidth=1.5;g.strokeRect(13.5,13.5,W-27,H-27);
+    g.strokeStyle="rgba(122,96,50,.22)";g.lineWidth=1;g.strokeRect(18.5,18.5,W-37,H-37);
     g.textAlign="center";g.textBaseline="middle";
-    g.fillStyle="rgba(122,96,50,.85)";g.font='600 34px Kangxi,Georgia,serif';
-    g.fillText("圣 书",W/2,H/2-16);
-    g.fillStyle="rgba(122,96,50,.6)";g.font='12px Georgia,serif';
-    g.fillText("B O M B A Y",W/2,H/2+30);
+    g.fillStyle="rgba(110,82,44,.9)";
+    g.font='600 28px Kangxi,Georgia,serif';
+    g.fillText("圣",W/2-24,H/2-18);
+    g.fillText("书",W/2+24,H/2-18);
+    g.fillStyle="rgba(110,82,44,.55)";g.font='11px Georgia,serif';
+    g.fillText("B O M B A Y",W/2,H/2+22);
+    g.fillStyle="rgba(84,62,34,.10)";
+    g.beginPath();g.moveTo(0,H);g.lineTo(0,H-14);
+    g.quadraticCurveTo(W*.3,H-26,W*.55,H-18);
+    g.quadraticCurveTo(W*.8,H-10,W,H-20);g.lineTo(W,H);g.closePath();g.fill();
   });
 }
 function sandSpineCanvas(){
   const W=96,H=512;
   return surface(W,H,g=>{
-    g.fillStyle="rgb(173,153,118)";g.fillRect(0,0,W,H);
-    for(let yy=0;yy<H;yy+=3){g.fillStyle=yy%6?"rgba(0,0,0,.05)":"rgba(255,250,235,.05)";g.fillRect(0,yy,W,1)}
-    for(let i=0;i<300;i++){g.fillStyle=rnd()<.5?"rgba(255,245,220,.06)":"rgba(92,72,42,.08)";g.fillRect(rnd()*W,rnd()*H,1+rnd()*2,1)}
+    const gr=g.createLinearGradient(0,0,0,H);
+    gr.addColorStop(0,"rgb(184,163,127)");gr.addColorStop(.5,"rgb(172,151,116)");gr.addColorStop(1,"rgb(132,111,82)");
+    g.fillStyle=gr;g.fillRect(0,0,W,H);
+    for(let yy=0;yy<H;yy+=2){g.fillStyle=yy%4?"rgba(0,0,0,.035)":"rgba(255,248,230,.04)";g.fillRect(0,yy,W,1)}
+    for(let i=0;i<700;i++){
+      const yy=Math.random()*H;
+      if(Math.random()>(yy/H)*1.1+.05)continue;
+      g.fillStyle=Math.random()<.5?"rgba(255,243,214,.12)":"rgba(84,62,34,.12)";
+      g.fillRect(Math.random()*W,yy,1,1);
+    }
     g.fillStyle="rgba(0,0,0,.3)";g.fillRect(0,0,6,H);g.fillRect(W-6,0,6,H);
-    g.fillStyle="rgba(122,96,50,.7)";g.fillRect(10,40,W-20,6);g.fillRect(10,H-48,W-20,6);
+    g.fillStyle="rgba(122,96,50,.55)";g.fillRect(10,44,W-20,5);g.fillRect(10,H-52,W-20,5);
     g.save();g.translate(W/2,H/2);g.rotate(Math.PI/2);g.textAlign="center";g.textBaseline="middle";
-    g.fillStyle="rgba(90,66,32,.9)";g.font='600 30px Kangxi,Georgia,serif';
+    g.fillStyle="rgba(96,72,38,.9)";g.font='600 28px Kangxi,Georgia,serif';
     g.fillText("圣 书",0,-16);
-    g.fillStyle="rgba(90,66,32,.75)";g.font='600 15px Georgia,serif';
+    g.fillStyle="rgba(96,72,38,.7)";g.font='600 14px Georgia,serif';
     g.fillText("B O M B A Y",0,20);
     g.restore();
   });
@@ -907,7 +935,7 @@ function metaLine(m){
     :`六角室 ${m.hx}-${m.hy} · 第 ${m.face} 面 · 第 ${m.shelf} 格 · 第 ${m.copy} 册`;
 }
 const HEXSVG='<svg class="hexs" viewBox="0 0 40 40"><polygon points="35.6,11 35.6,29 20,38 4.4,29 4.4,11 20,2" fill="none" stroke="#bd9a5e" stroke-width="1.8"/><polygon points="30.2,14.1 30.2,25.9 20,31.7 9.8,25.9 9.8,14.1 20,8.3" fill="none" stroke="#8f7a52" stroke-width="1"/><circle cx="20" cy="11.9" r="1.1" fill="#d8b16e"/><rect x="13.5" y="18.1" width="2" height="7.7" rx="1" fill="#c9a163"/><rect x="16.3" y="16.4" width="2" height="9.4" rx="1" fill="#c9a163"/><rect x="19.2" y="18.8" width="2" height="7" rx="1" fill="#c9a163"/><rect x="22" y="15.6" width="2" height="10.2" rx="1" fill="#c9a163"/><rect x="24.8" y="17.7" width="2" height="8.1" rx="1" fill="#c9a163"/></svg>';
-const SAND_ANCHOR_SVG='<svg viewBox="0 0 120 120" style="width:92px;height:92px;display:block;margin:4px auto"><g fill="none" stroke="#33291c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" transform="rotate(2.5 60 60)"><circle cx="60" cy="21" r="9"/><line x1="60" y1="30" x2="61" y2="95"/><line x1="43" y1="45" x2="78" y2="44"/><path d="M29 73 Q33 96 60 98 Q87 96 91 73"/><path d="M29 73 L23 82 M29 73 L37 80 M91 73 L97 82 M91 73 L83 80"/></g></svg>';
+const SAND_ANCHOR_SVG='<svg viewBox="0 0 120 120" style="display:block;width:100%;height:100%"><g fill="none" stroke="#33291c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" transform="rotate(2.5 60 60)"><circle cx="60" cy="21" r="9"/><line x1="60" y1="30" x2="61" y2="95"/><line x1="43" y1="45" x2="78" y2="44"/><path d="M29 73 Q33 96 60 98 Q87 96 91 73"/><path d="M29 73 L23 82 M29 73 L37 80 M91 73 L97 82 M91 73 L83 80"/></g></svg>';
 function sandGib(lines){
   const rg=makeRng((Math.random()*0x7FFFFFFF|0)||1);let out="";
   for(let i=0;i<lines;i++){
@@ -930,7 +958,7 @@ function textPage(bd,no){
     n.textContent="— "+fmtNum(anchor?10000000+((Math.random()*89999999)|0):100+((Math.random()*99899900)|0))+" —";
     if(anchor){
       t2.textContent=sandGib(6);
-      const sv=document.createElement("div");sv.innerHTML=SAND_ANCHOR_SVG;t2.appendChild(sv);
+      const sv=document.createElement("div");sv.style.cssText="width:92px;height:92px;margin:4px auto";sv.innerHTML=SAND_ANCHOR_SVG;t2.appendChild(sv);
       const more=document.createElement("div");more.textContent=sandGib(4);t2.appendChild(more);
     }else t2.textContent=sandGib(16);
   }else{
@@ -941,7 +969,7 @@ function textPage(bd,no){
 }
 function titleNode(bd){
   const d=document.createElement("div");d.className="pg tp";
-  if(bd.userData.sand){d.innerHTML=HEXSVG+`<div class="ttl">«${window.__lang==="en"?"Holy Writ":"圣 书"}»</div><div class="rule"></div><div class="sub">B O M B A Y</div><div class="idx">${window.__lang==="en"?"— thy ropes of sand —<br>George Herbert":"——你的沙制的绳索——<br>乔治 · 赫伯特"}</div>`;return d}
+  if(bd.userData.sand){d.innerHTML=`<div style="width:44px;height:44px;margin:0 auto">${SAND_ANCHOR_SVG}</div>`+`<div class="ttl">«${window.__lang==="en"?"Holy Writ":"圣 书"}»</div><div class="rule"></div><div class="sub">B O M B A Y</div><div class="idx">${window.__lang==="en"?"— thy ropes of sand —<br>George Herbert":"——你的沙制的绳索——<br>乔治 · 赫伯特"}</div>`;return d}
   if(bd.userData.babel){d.innerHTML=HEXSVG+`<div class="ttl">«The Library<br>of Babel»</div><div class="rule"></div><div class="sub">JORGE LUIS BORGES</div><div class="idx">The universe (which others call the Library)…</div>`;return d}
   d.innerHTML=HEXSVG+`<div class="ttl">«${bd.userData.title}»</div><div class="rule"></div><div class="sub">B I B L I O T H E C A</div><div class="idx">${metaLine(bookMeta(bd))}</div>`;
   return d;
