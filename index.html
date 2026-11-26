@@ -32,7 +32,7 @@ body.en h1{letter-spacing:.1em;padding-left:.1em;font-size:clamp(24px,4.4vw,42px
 footer{bottom:4%;font-size:12px;color:#c9b89c99;letter-spacing:.14em}
 body.en footer{letter-spacing:.03em}
 footer a{pointer-events:auto;color:inherit;text-decoration:none;border-bottom:1px solid #c9b89c44;transition:color .3s}
-footer a:hover{color:#ecd9ab}
+footer a:hover{color:#ecd9ab}.fhints{display:inline-flex;flex-wrap:wrap;justify-content:center;column-gap:.75em;row-gap:2px}.fhints span:not(:last-child)::after{content:"·";margin-left:.75em;opacity:.55}.fops{margin-left:1.5em}.fops .sep{margin:0 .65em;opacity:.55}@media (max-width:640px){.fops{display:block;margin:6px 0 0}}
 p{position:absolute;top:43%;width:100%;text-align:center;color:#baa98a;font-size:14px;pointer-events:none}
 #tip{position:absolute;z-index:4;pointer-events:none;font-size:13px;letter-spacing:.14em;color:#e6d4a8;background:#0e0a06d9;border:1px solid #62574b;padding:5px 12px;opacity:0;transition:opacity .16s;white-space:nowrap}
 body.en #tip{letter-spacing:.05em}
@@ -80,8 +80,6 @@ body.en #about h2{letter-spacing:.12em}
 #about .quotes{border-top:1px solid #62574166;margin-top:4px;padding-top:12px}
 .quotes blockquote{margin:0 0 10px;font-size:12.5px;line-height:1.95;color:#c6b598;text-align:justify}
 .quotes blockquote span{display:block;text-align:right;font-size:11px;color:#8f826b;margin-top:3px}
-.knote{font-size:12.5px;line-height:2;color:#b7a684;text-align:justify;margin-top:2px}
-.klabel{display:block;text-align:center;color:#d8bd8b;letter-spacing:.3em;margin-bottom:4px;font-size:12px}
 .epigraph{color:#d9c79e;text-align:center;line-height:1.9;margin-bottom:14px}
 #about .epigraph span{display:block;font-size:11px;color:#8f826b;margin-top:4px}
 #about .count{color:#9a8c72;text-align:center;font-size:12px}
@@ -124,25 +122,25 @@ body.en #about h2{letter-spacing:.12em}
 
 <!-- 独立哨兵脚本 -->
 <script>
-function reportError(t2){const m=document.getElementById("status");if(m&&m.hidden!==true)m.textContent="载入异常 / Load error: "+t2+"（请刷新 / please refresh）"}
+function reportError(t2){const m=document.getElementById("status");if(!m||m.hidden===true)return;if(location.protocol==="file:"){m.textContent=window.__lang==="en"?'Local preview via double-click is blocked by the browser. Run "npx serve" (or "python -m http.server") in this folder, then open http://localhost:3000 — or visit the live site.':'双击打开无法加载三维引擎（浏览器安全限制）。请在本文件夹运行 "npx serve" 或 "python -m http.server"，然后打开 http://localhost:3000 预览；线上站点不受影响。';return}m.textContent="载入异常 / Load error: "+t2+"（请刷新 / please refresh）"}
 addEventListener("error",ev=>reportError((ev&&ev.message)||"unknown"));
 addEventListener("unhandledrejection",ev=>reportError((ev&&ev.reason&&ev.reason.message)||"unknown"));
 </script>
 <!-- 语言与引导脚本 -->
 <script>
 const I18N={
-zh:{title:"巴别图书馆",hex:"六 角 回 廊",h1:"巴 别 图 书 馆",footer:"拖拽环视 · 滚轮推拉 · 点击取卷",about:"馆志",opening:"正在进入图书馆…",
+zh:{title:"巴别图书馆",hex:"六 角 回 廊",h1:"巴 别 图 书 馆",footer:"拖拽环视 · 滚轮推拉 · 点击取卷 · 点架召书",about:"馆志",opening:"正在进入图书馆…",
  wd:"图书馆久未开启 · 请检查网络后刷新重试",fail3d:"未能开启三维场景",ctx:"图形设备已暂停，请刷新。",take:"取卷",blog:"博客",
  abTitle:"巴 别 馆 志",epi:"「宇宙（别人管它叫图书馆）。」",epiBy:"—— 博尔赫斯《巴别图书馆》",
  ab1:"本站致敬博尔赫斯《巴别图书馆》：六角回廊环环相嵌，书架与半空的浮动书，皆由二十几个字母与逗、句、空格随机拼合而成。书脊上那些题名并非书名，只是字母的偶然；绝大多数书是无可解读的天书。你现在看到的每一册，都刚刚被随意地“写”了出来。",
- ab2:"取下任何一卷，先见封面；点按右半向左翻、左半向右翻，亦可按住页边拖拽翻页，直至封底。若某页忽然读出了意义，请理解为巧合：在一座收藏一切可能的图书馆里，荒诞与真理同属馆藏，谬误与奇迹皆为序章。",
- hand:"图书管理员手记",handNote:"起初只想复刻一座回廊，后来却在随机的天书里坐了很久。大海捞针式的阅读近乎绝望，可反过来想——既然一切都已被写下，那么一切也都正在等待被读到。我们终其一生翻开的不过寥寥数册，而仅仅是知道那本「全书」确实躺在某个六角形里，此刻的黑夜与执念便都有了归处。愿你在此撞见的每一页偶然，都是你的必然。",keeper:"图书馆管理员 · ",close:"合 卷",readN:"至此，您已在此馆翻阅过 {n} 页。"},
-en:{title:"The Library of Babel",hex:"THE HEXAGONAL GALLERIES",h1:"The Library of Babel",footer:"Drag to look around · Scroll to approach · Click to take a volume",about:"About",opening:"Entering the Library…",
+ ab2:"取下任何一卷，先见封面；点按右半向左翻、左半向右翻，亦可按住页边拖拽翻页，直至封底。此外，点击书架可自架上召出一册新书：馆中藏书无限，取之不竭；浮书渐多时，早先召唤的书自会悄然归架。若某页忽然读出了意义，请理解为巧合：在一座收藏一切可能的图书馆里，荒诞与真理同属馆藏，谬误与奇迹皆为序章。",
+ keeper:"图书馆管理员 · ",close:"合 卷",readN:"至此，您已在此馆翻阅过 {n} 页。"},
+en:{title:"The Library of Babel",hex:"THE HEXAGONAL GALLERIES",h1:"The Library of Babel",footer:"Drag to look around · Scroll to approach · Click to take a volume · Tap a shelf to summon",about:"About",opening:"Entering the Library…",
  wd:"The Library is slow to open · check your connection and refresh",fail3d:"Could not start the 3-D scene",ctx:"The graphics device was paused — please refresh.",take:"take",blog:"Blog",
  abTitle:"About this Library",epi:"“The universe (which others call the Library)…”",epiBy:"— Jorge Luis Borges, “The Library of Babel”",
  ab1:"This Library is a homage to Borges' “The Library of Babel”: hexagonal galleries nested without end. The books on the shelves and floating in mid-air are composed at random from two dozen letters, commas, periods, and spaces. The marks on the spines are not titles, only accidents of letters; most volumes are indecipherable gibberish. Every book you see has just been casually “written” into existence, right now.",
- ab2:"Take down any volume to see its cover. Tap the right half to turn forward, the left half to turn back, or drag a page edge to flip—just like reading a physical book—until the very end. If a page suddenly makes sense, take it as coincidence: in a Library that holds all possibilities, absurdity and truth belong alike to the collection. Error and miracle are both prologues.",
- hand:"KEEPER'S NOTE",handNote:"When I began, I only meant to rebuild one gallery; I ended up sitting a long while among the random volumes. Needle-in-haystack reading is close to despair — yet flip it around, and if everything has already been written, then everything is also waiting to be read. In one lifetime we open only a handful of books; but merely knowing that the 'complete book' rests on some hexagonal shelf gives this night and all its stubborn questions a place to rest. May every page of chance you meet here turn out to be your inevitability.",keeper:"Librarian · ",close:"CLOSE",readN:"So far you have turned {n} pages in this Library."}};
+ ab2:"Take down any volume to see its cover. Tap the right half to turn forward, the left half to turn back, or drag a page edge to flip—just like reading a physical book—until the very end. You may also tap a bookshelf to summon a new volume from its shelves: the collection is inexhaustible, and when the air grows crowded, earlier summons quietly return to their shelves. If a page suddenly makes sense, take it as coincidence: in a Library that holds all possibilities, absurdity and truth belong alike to the collection. Error and miracle are both prologues.",
+ keeper:"Librarian · ",close:"CLOSE",readN:"So far you have turned {n} pages in this Library."}};
 const EMBLEM='<svg class="emblem" viewBox="0 0 40 40" aria-hidden="true"><polygon points="33.9,12 33.9,28 20,36 6.1,28 6.1,12 20,4" fill="none" stroke="#bd9a5e" stroke-width="1.6"/><polygon points="28.7,15 28.7,25 20,30 11.3,25 11.3,15 20,10" fill="none" stroke="#8f7a52" stroke-width="1"/><circle cx="20" cy="20" r="1.8" fill="#d8b16e"/></svg>';
 function t(k){const L=window.__lang||"zh";return (I18N[L]&&I18N[L][k])||I18N.zh[k]||k}
 function readCount(){try{return +(localStorage.getItem("babel_pages")||0)}catch(_){return 0}}
@@ -162,7 +160,7 @@ function buildAbout(){
   ab.querySelector("article").innerHTML=
    `<h2>${t("abTitle")}${EMBLEM}</h2>`+
    `<p class="epigraph">${t("epi")}<span>${t("epiBy")}</span></p>`+
-   `<p>${t("ab1")}</p><p>${t("ab2")}</p>`+`<div class="quotes">${QUOTES.map(q=>{const v=q[window.__lang==="en"?"en":"zh"];return `<blockquote>${window.__lang==="en"?`“${v.t}”`:`『${v.t}』`}<span>—— ${v.a}</span></blockquote>`}).join("")}</div>`+`<p class="knote"><span class="klabel">${t("hand")}</span>${t("handNote")}</p>`+
+   `<p>${t("ab1")}</p><p>${t("ab2")}</p>`+`<div class="quotes">${QUOTES.map(q=>{const v=q[window.__lang==="en"?"en":"zh"];return `<blockquote>${window.__lang==="en"?`“${v.t}”`:`『${v.t}』`}<span>—— ${v.a}</span></blockquote>`}).join("")}</div>`+
    `<p class="count">${n>0?t("readN").replace("{n}",n):""}</p>`+
    `<span class="who">${t("keeper")}<a href="https://home.azad.asia/" target="_blank" rel="noopener">Azad</a> · <a href="https://babel.azad.asia/" target="_blank" rel="noopener">${t("blog")}</a></span>`+
    `<button class="close" type="button">${t("close")}</button>`;
@@ -178,7 +176,7 @@ function applyLang(l){
   const sm=document.querySelector("header small");if(sm)sm.textContent=t("hex");
   const h1=document.querySelector("h1");if(h1)h1.textContent=t("h1");
   const ft=document.querySelector("footer");
-  if(ft)ft.innerHTML=`${t("footer")} · <a href="#" id="langBtn">${l==="zh"?"EN":"中文"}</a> · <a href="#" id="about-link">${t("about")}</a>`;
+  if(ft){const hs=t("footer").split(" · ");try{if(matchMedia("(pointer:coarse)").matches){hs.length=0;if(l==="en"){hs.push("Drag to look","Pinch to zoom","Tap a book","Tap a shelf")}else{hs.push("拖拽环视","双指推拉","点击取卷","点架召书")}}}catch(_){}ft.innerHTML=`<span class="fhints">${hs.map(h=>`<span>${h}</span>`).join("")}</span><span class="fops"><a href="#" id="langBtn">${l==="zh"?"EN":"中文"}</a><span class="sep">·</span><a href="#" id="about-link">${t("about")}</a></span>`;}
   const st=document.getElementById("status");
   if(st&&!st.hidden)st.textContent=t("opening");
   buildAbout();
@@ -461,13 +459,13 @@ for(let k=0;k<6;k++){
   sil.rotation.y=a+Math.PI;scene.add(sil);
 }
 function buildIM(arr,mat){const im=new T.InstancedMesh(new T.BoxGeometry(),mat,arr.length);arr.forEach(([m,col],i)=>{im.setMatrixAt(i,m);im.setColorAt(i,new T.Color(col))});im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.castShadow=im.receiveShadow=true;return im}
-scene.add(buildIM(frameP,woodMat));
+const frameIM=buildIM(frameP,woodMat);const shelfIMs=[frameIM];scene.add(frameIM);
 const shelfGeo=new T.BoxGeometry(1,1,1);
 for(let st=0;st<5;st++)for(let v=0;v<2;v++){const arr=volArr[st][v];
   if(arr.length){const im=new T.InstancedMesh(shelfGeo,[pagesMat,pagesMat,pagesMat,pagesMat,pagesMat,shelfSpineMat[st][v]],arr.length);
    arr.forEach(([m,col],i)=>{im.setMatrixAt(i,m);im.setColorAt(i,new T.Color(col))});
    im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;
-   im.castShadow=im.receiveShadow=true;scene.add(im)}}
+   im.castShadow=im.receiveShadow=true;shelfIMs.push(im);scene.add(im)}}
 
 /* ---- 漂浮之书（种子随机）---- */
 const coverCols={leather:[[96,34,28],[30,62,48],[46,54,86],[64,46,28],[40,36,36],[74,54,24]],
@@ -550,6 +548,49 @@ function addFloater(i,r,y,ang,sc){
     fF:.3+rg()*.4,fP:rg()*tau,fA:.09+rg()*.13,rF:.12+rg()*.25,rP:rg()*tau,sc,baseRot,
     veiled:false,sent:false};
   scene.add(m);books.push(m);
+}
+const spawnedBooks=[];const SPAWN_MAX=mobile?6:10;
+function disposeBook(m){
+  scene.remove(m);
+  (Array.isArray(m.material)?m.material:[m.material]).forEach(mt=>{
+    if(mt.map)mt.map.dispose();
+    if(mt.emissiveMap&&mt.emissiveMap!==mt.map)mt.emissiveMap.dispose();
+    mt.dispose();
+  });
+  m.userData.dead=true;
+}
+function recycle(m){
+  if(flight===m||m.userData.dying)return;
+  m.userData.dying=true;
+}
+function spawnFromShelf(e){
+  if(flight||!reader.hidden)return;
+  point(e);ray.setFromCamera(uv,cam);
+  const hit=ray.intersectObjects(shelfIMs,false)[0];
+  if(!hit)return;
+  const scNew=.42+rnd()*.35;
+  const p=hit.point.clone();let placed=false;
+  for(let off=.55;off<=1.9&&!placed;off+=.45){
+    const q=hit.point.clone();
+    const dir=cam.position.clone().sub(q).normalize();
+    q.add(dir.multiplyScalar(off));
+    q.y=Math.max(-3,Math.min(8.2,q.y));
+    placed=true;
+    for(const o of books){
+      if(o.userData.dying||o.userData.dead)continue;
+      const dx=q.x-o.position.x,dz=q.z-o.position.z;
+      if(dx*dx+dz*dz<Math.pow((scNew+o.userData.sc)*.62,2)&&Math.abs(q.y-o.position.y)<1.1){placed=false;break}
+    }
+    if(placed)p.copy(q);
+  }
+  while(spawnedBooks.length>=SPAWN_MAX){
+    const old=spawnedBooks.shift();recycle(old);
+  }
+  addFloater(fi++,1.4+rnd()*3.2,-2.6+rnd()*7.5,rnd()*tau,scNew);
+  const m=books[books.length-1];
+  m.userData.base=p.clone();m.position.copy(p);
+  m.userData.born=0;m.scale.setScalar(.001);
+  spawnedBooks.push(m);
 }
 let fi=0;
 for(let i=0;i<NF1;i++)addFloater(fi++,1.4+rnd()*3.2,-3.1+rnd()*8.1,rnd()*tau,.5+rnd()*.6);
@@ -751,7 +792,7 @@ function open(m){
 }
 canvas.onpointerdown=e=>{held.add(e.pointerId);point(e);mouse=false;down=held.size===1&&e.button===0?{id:e.pointerId,x:e.clientX,y:e.clientY,m:pick()}:null};
 canvas.onpointermove=e=>{point(e);px=e.clientX;py=e.clientY;mouse=!held.size&&e.pointerType==="mouse";if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)down=null};
-canvas.onpointerup=e=>{held.delete(e.pointerId);point(e);if(down?.id===e.pointerId&&pick()===down.m&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<=6)open(down.m);down=null};
+canvas.onpointerup=e=>{held.delete(e.pointerId);point(e);if(down?.id===e.pointerId&&pick()===down.m&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<=6){const m=down.m;if(m)open(m);else spawnFromShelf(e);}down=null};
 canvas.onpointercancel=e=>{held.delete(e.pointerId);down=null};canvas.onpointerleave=()=>mouse=false;
 
 /* ================= 阅读器 ================= */
@@ -1027,7 +1068,7 @@ window.__onLang=()=>{if(curBook&&!reader.hidden)syncStatic()};
 
 function size(){const w=canvas.clientWidth,h=canvas.clientHeight,p=Math.min(devicePixelRatio,mobile?1.75:2.25,Math.sqrt((mobile?2400000:3200000)/(w*h)));r.setPixelRatio(p);r.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<h?65:57;cam.updateProjectionMatrix();glyphU.px=h*p*.32;if(post){post.setPixelRatio(p);post.setSize(w,h);aa.uniforms.resolution.value.set(1/post.readBuffer.width,1/post.readBuffer.height);dof.uniforms.aspect.value=w/h}}size();addEventListener("resize",size);
 let fq=0,fn2=0;function frame(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;if(post&&time>3){fq+=dt;fn2++;if(fn2>=120){if(fq/fn2>1/29){post=null;aa=null;dof=null;size()}else{fq=0;fn2=0}}}time+=dt*(quiet?.2:1);if(!flight)ctl.update();cam.updateMatrixWorld();
-for(const m of books){if(m===flight)continue;const d=m.userData,s0=time*d.fF+d.fP;
+for(const m of books){if(m===flight)continue;if(m.userData.dying){m.userData.born=Math.max(0,(m.userData.born!==undefined?m.userData.born:1)-dt*2.4);m.scale.setScalar(Math.max(.001,m.userData.sc*m.userData.born));if(m.userData.born<=0)disposeBook(m)}else if(m.userData.born!==undefined&&m.userData.born<1){m.userData.born=Math.min(1,m.userData.born+dt*2.2);m.scale.setScalar(m.userData.sc*(.08+.92*(1-Math.pow(1-m.userData.born,3))))}const d=m.userData,s0=time*d.fF+d.fP;
   m.position.copy(d.base);m.position.y+=d.fA*Math.sin(s0);
   const rr=Math.sin(time*d.rF+d.rP)*.15;
   m.rotation.set(.09*Math.sin(s0*.8),d.baseRot+rr*.5,.07*Math.cos(s0*.7));
@@ -1051,8 +1092,8 @@ if(flight){
     }
   }
 }
-const hot=(mouse&&!flight)?pick():null,kk=1-Math.exp(-dt*10);
-for(const m of books){if(m===flight)continue;
+for(let _i=books.length-1;_i>=0;_i--)if(books[_i].userData.dead)books.splice(_i,1);for(let _j=spawnedBooks.length-1;_j>=0;_j--)if(spawnedBooks[_j].userData.dead)spawnedBooks.splice(_j,1);const hot=(mouse&&!flight)?pick():null,kk=1-Math.exp(-dt*10);
+/* 软分离：靠得太近的浮书互相推开（仅水平面，避开上下漂浮差异） */for(let _a=0;_a<books.length;_a++){const _ma=books[_a];if(_ma===flight||_ma.userData.dying||_ma.userData.dead)continue;for(let _b=_a+1;_b<books.length;_b++){const _mb=books[_b];if(_mb===flight||_mb.userData.dying||_mb.userData.dead)continue;if(Math.abs(_ma.position.y-_mb.position.y)>1.1)continue;const _dx=_ma.position.x-_mb.position.x,_dz=_ma.position.z-_mb.position.z,_d2=_dx*_dx+_dz*_dz;const _min=(_ma.userData.sc+_mb.userData.sc)*.62;if(_d2<_min*_min&&_d2>1e-6){const _d=Math.sqrt(_d2),_p=(_min-_d)*.5,_k=1-Math.exp(-dt*3);const _mx=_dx/_d*_p*_k,_mz=_dz/_d*_p*_k;_ma.userData.base.x+=_mx;_ma.userData.base.z+=_mz;_mb.userData.base.x-=_mx;_mb.userData.base.z-=_mz;}}}for(const m of books){if(m===flight)continue;
  let lampF=0;
  for(const l of lamps){const dy=m.position.y-l.bulb.y;if(dy<-.15&&dy>-6.5){const dh=Math.hypot(m.position.x-l.bulb.x,m.position.z-l.bulb.z);if(dh<1.6){const f=(1-dh/1.6)*(1+dy/6.5);if(f>lampF)lampF=f}}}
  let t2=m===hot?EMI_HOT:EMI_BASE;

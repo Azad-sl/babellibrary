@@ -1,4 +1,4 @@
-const VERSION = "babel-v6";
+const VERSION = "babel-v14";
 const ASSETS = [
   "./",
   "./index.html",
